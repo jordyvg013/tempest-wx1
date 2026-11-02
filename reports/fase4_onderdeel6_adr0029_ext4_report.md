@@ -35,7 +35,7 @@ Vergelijking van WX-1 Dyadisch ($\Delta = 2^{\lfloor\log_2(2\epsilon)\rfloor}$, 
 | `eumetsat_mtg_fci_olr` | 0.1 | **5.22** (0.0600) | **4.59** (0.1000) | 7.13 (0.1000) | 10.03 (0.0078) | 7.49 (0.0300) | 9.62 (0.0300) | ✅ 0.0 exact (drift=0.0e+00) |
 | `eumetsat_mtg_fci_olr` | 0.01 | **8.40** (0.0075) | **8.05** (0.0100) | 11.75 (0.0100) | 13.72 (0.0009) | 10.07 (0.0037) | 13.18 (0.0037) | ✅ 0.0 exact (drift=0.0e+00) |
 
-*Verklaring:* Doordat zowel de dyadische als de niet-dyadische stap exact op $0.0$ zijn verankerd (`round(x / step) * step`) én beiden dezelfde `int32` container voor byte-shuffle gebruiken, bedraagt de niet-dyadische winst altijd exact de informatietheoretische $\log_2(\Delta_{\text{dyadic}} / 2\epsilon) \le 1$ bit/waarde en blijven nullen exact `0.0`.
+*Verklaring:* Zowel de dyadische als de niet-dyadische stap zijn exact op $0.0$ verankerd (`round(x / step) * step`). Waar de theoretische continue entropiewinst maximaal $\log_2(\Delta_{\text{dyadisch}} / 2\epsilon)$ bedraagt, kunnen de werkelijk gerealiseerde bits/waarde na compressie hiervan afwijken (bijv. 1.09 bit bij Kolmogorov $\epsilon=0.1$). Dit verschil ontstaat doordat de `int32` byte-shuffle-pijplijn en LZ77/FSE in Zstandard reageren op byte-uitlijning en herhalende nulpatronen. Nullen blijven in beide methoden exact `0.0`.
 
 ## 3. Integer-Packing Doorvoer (MB/s) & Bits/Val vs GRIB2 CCSDS (Punt 3 & 4)
 Gemeten met de `zstd 0.13`-crate (libzstd 1.5.7) en gevectoriseerde 2D prefix-sum reconstructie (`np.cumsum`). Wire-formaat blijft ongewijzigd; een toekomstige geregistreerde integer-packing codec vereist eerst een aparte ADR.
@@ -64,8 +64,13 @@ Linux-paginacache geleegd via `posix_fadvise(POSIX_FADV_DONTNEED)`. De 4 compone
 | `ecmwf_nh_pl_t14` | **220.52 ms** | 215.49 ms (+-5.04 ms) | 126.28 ms (0.57x) | ~27.84 ms | ~3.567 ms |
 | `knmi_harm46_nl` | **7.35 ms** | 7.38 ms (+0.03 ms) | 10.03 ms (1.36x) | ~0.71 ms | ~0.784 ms |
 
+*Analyse van de ablatie-uitkomsten:*
+- **Parallelle Thread-overhead bij `t14`**: Bij `t14` (14 niveaus van elk ~45 KB gecomprimeerd) veroorzaakte het per batch opspinnen en synchroniseren van OS-threads onder WSL2 op een hybride P/E-core architectuur (Intel Core i5-12500H) thread-contention. Seriële decompressie was 1,75× sneller (126 ms vs 220 ms). Dit is opgelost met een decompressie-heuristiek die batches onder 512 KiB automatisch in-thread (serieel) verwerkt.
+- **Descriptor-cache en ruis**: De verschillen (-0.18 tot +0.03 ms) vallen binnen de meetruis op ext4.
+- **Software CRC32C**: De software slice-by-8 CRC32C neemt 0.33 tot 3.57 ms in beslag. Hardware-versnelde instructies (SSE4.2) kunnen dit reduceren zodra een ADR inline CPU intrinsics toestaat binnen `#![forbid(unsafe_code)]`.
+
 ## 5. ADR 0029: Prestaties van de Wetenschappelijke Leespaden (R1 t/m R9)
-Metingen uitgevoerd op **WSL2 Native ext4 (/dev/sdd direct I/O)** met expliciete vermelding van GRIB2, NetCDF-4 en Zarr v3 ter vergelijking:
+Metingen uitgevoerd op **WSL2 Native ext4 (/dev/sdd)** met geleegde Linux-paginacache via `posix_fadvise(POSIX_FADV_DONTNEED)`. Let op: GRIB2 speedup (bijv. 385× op R1 of 204× op R4) is gemeten zonder vooraf berekend extern `.idx`-bestand; tegenover de geoptimaliseerde array-formaten **NetCDF-4** en **Zarr v3** behaalt WX-1 een reële en sterke versnelling van **3× tot 7×**:
 
 | Leespad | Beschrijving | WX-1 Warm (ms) | WX-1 Linux-Cache Koud (ms) | GRIB2 (ms) | NetCDF-4 (ms) | Zarr v3 (ms) | Speedup vs GRIB2 | Status t.o.v. ≥2× Doel |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
