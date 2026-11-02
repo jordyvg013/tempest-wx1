@@ -66,7 +66,7 @@ De lineaire arrayplanner is een bekende schaalbaarheidsrisico. Na de Fase-2-nulm
 | 6 | Geavanceerde veld-/tijd-/punt-/regio-/tile-leespaden | 0029 | Geïmplementeerd en geverifieerd (R1 t/m R9, point-scatter 19.27 ms op 1000 stations) |
 | 7 | GRIB2/ecCodes, NetCDF en Zarr import/export met metadata-preservatie | 0030 | Geïmplementeerd en geverifieerd (bit-exact roundtrip, CLI convert, volledige metadata onder grib:*, cf:*, zarr:*) |
 | 8 | Fuzzing, onafhankelijke vectors, power-loss, security, migratie en cross-platform voor 1.0 | 0031 | Geïmplementeerd en geverifieerd (10k header fuzz, 11 golden vectors, crash recovery, forbid(unsafe_code)) |
-| 9 | Stabiele C ABI, cbindgen en golden files | 0032 | Gepland |
+| 9 | Stabiele C ABI, cbindgen en golden files | 0032 | Geïmplementeerd en geverifieerd (crates/wx1-ffi, include/wx1.h, GCC C-integratietest) |
 | 10 | GPU/multi-device overdracht, async writer en restart, pas na CPU API-stabiliteit | 0033 | Gepland |
 
 ADR 0019 blijft de interne Rust-microbenchmark; ADR 0021 wordt de aparte cross-format-suite. Bestaande ADR's 0001–0019 worden niet hernummerd.

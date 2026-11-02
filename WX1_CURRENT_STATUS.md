@@ -7,21 +7,23 @@
 
 ## 1. Bewijsbasis
 
-### v0.4.3 + Fase 4 Onderdeel 8 Rust- & Python-verificatie
+### v0.4.3 + Fase 4 Onderdeel 8 & 9 Rust-, Python- & C-ABI-verificatie
 
-- `cargo fmt --all -- --check`: uitgevoerd en zonder fout afgerond.
-- `cargo clippy --workspace --all-targets -- -D warnings`: uitgevoerd en zonder waarschuwingen afgerond (0 warnings).
-- `cargo test --workspace`: 155 geslaagd, 0 mislukt.
+- `cargo fmt --all -- --check`: uitgevoerd en zonder fout afgerond (0 diffs).
+- `cargo clippy --workspace --all-targets -- -D warnings`: uitgevoerd en zonder waarschuwingen afgerond (0 warnings over alle 5 workspace-crates).
+- `cargo test --workspace`: 163 geslaagd, 0 mislukt.
   - 85 wx1-format unit-tests;
   - 24 scientific-array integration tests;
   - 7 scientific-streaming integration tests;
   - 14 wx1-registry tests;
   - 11 independent golden vectors tests;
-  - 9 fuzzing, crash recovery and security hardening tests;
+  - 12 fuzzing, crash recovery and security hardening tests;
+  - 4 wx1-ffi tests (inclusief automatische C-integratiebuild en testrun via GCC);
   - 4 wx1-python-native tests;
   - 1 CLI scientific workflow test.
-- `pytest python/tests`: 42 geslaagd, 3 geskipt (conformance golden vectors, adapters, xarray backend, roundtrip).
-- ADR 0031 (Fuzzing, Golden Conformance Vectors, Power-Loss Resilience, Security Hardening, Cross-Platform IEEE-754) volledig geverifieerd.
+- `pytest python/tests`: 45 geslaagd, 3 geskipt (conformance golden vectors 11/11, adapters, xarray backend, roundtrip).
+- ADR 0031 (Fuzzing, Golden Vectors, Power-Loss Resilience, Security Hardening, Cross-Platform) volledig geverifieerd.
+- ADR 0032 (Stabiele C-ABI, cbindgen, `include/wx1.h`, GCC C-integratietest) volledig geïmplementeerd en geverifieerd.
 
 ## 2. WSL-omgeving uit de aangeleverde run
 
