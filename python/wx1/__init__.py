@@ -8,9 +8,14 @@ from typing import Any, Mapping, Sequence
 
 try:
     from . import _core
-except ImportError as exc:  # source tree without a built maturin extension
-    _core = None
-    _CORE_IMPORT_ERROR = exc
+except ImportError:
+    try:
+        import _core
+    except ImportError as exc:  # source tree without a built maturin extension
+        _core = None
+        _CORE_IMPORT_ERROR = exc
+    else:
+        _CORE_IMPORT_ERROR = None
 else:
     _CORE_IMPORT_ERROR = None
 
