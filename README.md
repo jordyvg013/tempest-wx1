@@ -74,7 +74,7 @@ Under an identical declared error bound ($\pm 0.01\text{ m/s}$ max error):
 ### Python
 
 ```bash
-pip install wx1_python_native
+pip install tempest-wx1
 ```
 
 ```python

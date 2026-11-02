@@ -3,9 +3,9 @@ requires = ["maturin>=1.9,<2.0"]
 build-backend = "maturin"
 
 [project]
-name = "wx1"
+name = "tempest-wx1"
 version = "0.1.0"
-description = "Python interface for the experimental WX-1 scientific storage format"
+description = "Tempest: WX-1 — High-Performance Scientific Weather Storage Format"
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
