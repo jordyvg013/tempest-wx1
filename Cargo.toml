@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["crates/wx1-format", "crates/wx1-registry", "crates/wx1-cli", "bindings/wx1-python"]
+members = ["crates/wx1-format", "crates/wx1-registry", "crates/wx1-cli", "crates/wx1-ffi", "bindings/wx1-python"]
 
 [workspace.package]
 edition = "2021"

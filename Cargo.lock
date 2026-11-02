@@ -277,6 +277,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "wx1-ffi"
+version = "0.1.0"
+dependencies = [
+ "wx1-format",
+]
+
+[[package]]
 name = "wx1-format"
 version = "0.1.0"
 dependencies = [
