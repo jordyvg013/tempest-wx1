@@ -226,8 +226,13 @@ pytest python/tests/ -v
 
 ## License
 
-Licensed under either of:
-* Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
-* MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+Licensed under the Apache License, Version 2.0 ([LICENSE](LICENSE) or http://www.apache.org/licenses/LICENSE-2.0).
+Copyright 2026 Jordy van Gils.
 
-at your option.
+---
+
+## Acknowledgments & Data Attribution
+
+* Meteorological validation and benchmark datasets contain modified **Copernicus Climate Change Service (C3S) information [2026]**.
+* Neither the European Commission nor ECMWF is responsible for any use that may be made of the information or data it contains.
+* Reference: Hersbach, H. et al. (2020): *The ERA5 global reanalysis*. Quarterly Journal of the Royal Meteorological Society, 146(730), 1999–2049.
