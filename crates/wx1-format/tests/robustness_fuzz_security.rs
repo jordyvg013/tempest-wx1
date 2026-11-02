@@ -292,6 +292,72 @@ fn test_power_loss_and_recovery_simulation() {
 }
 
 #[test]
+fn test_power_loss_subprocess_sigkill_recovery() {
+    let temp_dir = std::env::temp_dir();
+    let file_path = temp_dir.join(format!("wx1_sigkill_{}.wx1", std::process::id()));
+    if file_path.exists() {
+        let _ = std::fs::remove_file(&file_path);
+    }
+
+    // Write Generation 1
+    let metadata = Metadata::new("subprocess-sigkill-resilience");
+    let gen1_chunks = [EncodedChunkInput {
+        id: 1,
+        data: b"generation-1-durable-baseline",
+        codec: ChunkCodec::Zstandard,
+    }];
+    {
+        let mut file = File::create(&file_path).unwrap();
+        write_generation_container(
+            &mut file,
+            &metadata,
+            &gen1_chunks,
+            HeaderByteOrder::LittleEndian,
+        )
+        .unwrap();
+        file.sync_all().unwrap();
+    }
+    let gen1_size = std::fs::metadata(&file_path).unwrap().len();
+
+    // Spawn a child process appending data and terminate it abruptly with SIGKILL
+    let mut child = std::process::Command::new("sh")
+        .arg("-c")
+        .arg(format!(
+            "echo -n 'partial-interrupted-bytes-stream' >> {} && sleep 10",
+            file_path.display()
+        ))
+        .spawn()
+        .expect("spawning child writer must succeed");
+
+    // Wait a brief moment for child to append partial bytes
+    std::thread::sleep(std::time::Duration::from_millis(50));
+
+    // Abruptly kill with SIGKILL
+    child.kill().expect("SIGKILL child process must succeed");
+    let _ = child.wait();
+
+    // File now has trailing uncommitted data
+    assert!(std::fs::metadata(&file_path).unwrap().len() > gen1_size);
+
+    // Verify repair trims file back to gen1_size and Generation 1 is intact
+    let report = repair_generation_file(&file_path).expect("repair after SIGKILL must succeed");
+    assert_eq!(report.generation, 1);
+    assert_eq!(report.retained_len, gen1_size);
+    assert_eq!(std::fs::metadata(&file_path).unwrap().len(), gen1_size);
+
+    // Verify Generation 1 is fully readable
+    {
+        let mut file = File::open(&file_path).unwrap();
+        let snapshot = open_generation_snapshot(&mut file).unwrap();
+        assert_eq!(snapshot.generation(), 1);
+        let payload = snapshot.read_chunk(&mut file, 1).unwrap();
+        assert_eq!(payload, b"generation-1-durable-baseline");
+    }
+
+    let _ = std::fs::remove_file(&file_path);
+}
+
+#[test]
 fn test_security_variable_path_traversal_rejection() {
     let mut model = ScientificDataset::new();
     model.dimensions = vec![Dimension {
@@ -378,46 +444,177 @@ fn test_security_group_path_traversal_rejection() {
 }
 
 #[test]
-fn test_security_decompression_bomb_and_length_guards() {
-    // 1. Claimed raw_len exceeding MAX_CHUNK_BYTES (64 MiB)
-    let payload = vec![0u8; 32];
-    let res = wx1_format::read_chunk_directory(&mut Cursor::new(&payload));
-    assert!(res.is_err());
-
-    // 2. Maximum dimensions rank rejection (> 64 rank)
-    let mut model = ScientificDataset::new();
-    let mut dims = Vec::new();
-    let mut dim_names = Vec::new();
-    let mut chunk_shape = Vec::new();
-    for i in 0..65 {
-        let name = format!("dim_{i}");
-        dims.push(Dimension {
+fn test_security_max_dimensions_and_rank_boundary() {
+    // Rank 64 is permitted (MAX_SCIENTIFIC_RANK = 64)
+    let mut model_64 = ScientificDataset::new();
+    let mut dims_64 = Vec::new();
+    let mut dim_names_64 = Vec::new();
+    let mut chunk_shape_64 = Vec::new();
+    for i in 0..64 {
+        let name = format!("d{i}");
+        dims_64.push(Dimension {
             name: name.clone(),
-            length: 2,
+            length: 1,
             role: DimensionRole::Other,
         });
-        dim_names.push(name);
-        chunk_shape.push(2);
+        dim_names_64.push(name);
+        chunk_shape_64.push(1);
     }
-    model.dimensions = dims;
-    model.variables = vec![Variable {
-        name: "hypercube".to_owned(),
+    model_64.dimensions = dims_64;
+    model_64.variables = vec![Variable {
+        name: "cube64".to_owned(),
         group: "/".to_owned(),
-        dimensions: dim_names,
+        dimensions: dim_names_64,
         data_type: DataType::F32,
         byte_order: PayloadByteOrder::LittleEndian,
-        chunk_shape,
+        chunk_shape: chunk_shape_64,
+        fill_value: None,
+        missing_value: None,
+        attributes: BTreeMap::new(),
+        chunks: vec![wx1_format::ArrayChunkRef {
+            chunk_id: 1,
+            origin: vec![0; 64],
+            shape: vec![1; 64],
+        }],
+        grid_mapping: None,
+    }];
+    assert!(model_64.validate().is_ok(), "Rank 64 must be allowed");
+
+    // Rank 65 is strictly rejected with RankMismatch
+    let mut model_65 = ScientificDataset::new();
+    let mut dims_65 = Vec::new();
+    let mut dim_names_65 = Vec::new();
+    let mut chunk_shape_65 = Vec::new();
+    for i in 0..65 {
+        let name = format!("d{i}");
+        dims_65.push(Dimension {
+            name: name.clone(),
+            length: 1,
+            role: DimensionRole::Other,
+        });
+        dim_names_65.push(name);
+        chunk_shape_65.push(1);
+    }
+    model_65.dimensions = dims_65;
+    model_65.variables = vec![Variable {
+        name: "cube65".to_owned(),
+        group: "/".to_owned(),
+        dimensions: dim_names_65,
+        data_type: DataType::F32,
+        byte_order: PayloadByteOrder::LittleEndian,
+        chunk_shape: chunk_shape_65,
         fill_value: None,
         missing_value: None,
         attributes: BTreeMap::new(),
         chunks: Vec::new(),
         grid_mapping: None,
     }];
-
     assert_eq!(
-        model.validate().unwrap_err(),
+        model_65.validate().unwrap_err(),
         ScientificModelError::RankMismatch
     );
+}
+
+#[test]
+fn test_security_max_chunk_refs_boundary() {
+    let mut model = ScientificDataset::new();
+    model.dimensions = vec![Dimension {
+        name: "dim0".to_owned(),
+        length: 2_000_000,
+        role: DimensionRole::Other,
+    }];
+
+    // Single variable with expected chunks > MAX_CHUNKS (1,048,576)
+    model.variables = vec![Variable {
+        name: "huge_var".to_owned(),
+        group: "/".to_owned(),
+        dimensions: vec!["dim0".to_owned()],
+        data_type: DataType::F32,
+        byte_order: PayloadByteOrder::LittleEndian,
+        chunk_shape: vec![1],
+        fill_value: None,
+        missing_value: None,
+        attributes: BTreeMap::new(),
+        chunks: vec![wx1_format::ArrayChunkRef {
+            chunk_id: 1,
+            origin: vec![0],
+            shape: vec![1],
+        }],
+        grid_mapping: None,
+    }];
+
+    // 2,000,000 expected chunks > MAX_CHUNKS rejected
+    let err = model.validate().unwrap_err();
+    assert_eq!(
+        err,
+        ScientificModelError::ChunkCoverage,
+        "single variable exceeding MAX_CHUNKS must fail with ChunkCoverage"
+    );
+
+    // Multiple variables whose total chunks exceed MAX_CHUNKS
+    let mut multi_model = ScientificDataset::new();
+    multi_model.dimensions = vec![Dimension {
+        name: "dim0".to_owned(),
+        length: 600_000,
+        role: DimensionRole::Other,
+    }];
+    let mut chunks_v1 = Vec::with_capacity(600_000);
+    let mut chunks_v2 = Vec::with_capacity(600_000);
+    for i in 0..600_000 {
+        chunks_v1.push(wx1_format::ArrayChunkRef {
+            chunk_id: i,
+            origin: vec![i],
+            shape: vec![1],
+        });
+        chunks_v2.push(wx1_format::ArrayChunkRef {
+            chunk_id: 600_000 + i,
+            origin: vec![i],
+            shape: vec![1],
+        });
+    }
+    multi_model.variables = vec![
+        Variable {
+            name: "v1".to_owned(),
+            group: "/".to_owned(),
+            dimensions: vec!["dim0".to_owned()],
+            data_type: DataType::F32,
+            byte_order: PayloadByteOrder::LittleEndian,
+            chunk_shape: vec![1],
+            fill_value: None,
+            missing_value: None,
+            attributes: BTreeMap::new(),
+            chunks: chunks_v1,
+            grid_mapping: None,
+        },
+        Variable {
+            name: "v2".to_owned(),
+            group: "/".to_owned(),
+            dimensions: vec!["dim0".to_owned()],
+            data_type: DataType::F32,
+            byte_order: PayloadByteOrder::LittleEndian,
+            chunk_shape: vec![1],
+            fill_value: None,
+            missing_value: None,
+            attributes: BTreeMap::new(),
+            chunks: chunks_v2,
+            grid_mapping: None,
+        },
+    ];
+
+    let multi_err = multi_model.validate().unwrap_err();
+    assert_eq!(
+        multi_err,
+        ScientificModelError::TooManyChunkReferences,
+        "cumulative chunk references exceeding 1,048,576 must fail with TooManyChunkReferences"
+    );
+}
+
+#[test]
+fn test_security_decompression_bomb_and_length_guards() {
+    // 1. Claimed raw_len exceeding MAX_CHUNK_BYTES (64 MiB)
+    let payload = vec![0u8; 32];
+    let res = wx1_format::read_chunk_directory(&mut Cursor::new(&payload));
+    assert!(res.is_err());
 }
 
 #[test]

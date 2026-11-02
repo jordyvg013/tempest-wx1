@@ -1,0 +1,117 @@
+{
+  "spec_version": "1.0-draft",
+  "adr_reference": "ADR 0031",
+  "generated_at": "2026-11-02T18:08:00Z",
+  "vectors": [
+    {
+      "id": "GV-01",
+      "filename": "gv01_valid_scalar_2d_zstd.wx1",
+      "size_bytes": 9150,
+      "sha256": "eaa3addd705cd93fed4f45341e57a844a6a67051c14a6aafccd05b34d527a98a",
+      "category": "valid",
+      "description": "2D air temperature field (16x16) compressed with Zstandard and CF-compliant metadata.",
+      "expected_outcome": "Pass",
+      "error_code": null
+    },
+    {
+      "id": "GV-02",
+      "filename": "gv02_valid_volume_3d_lz4.wx1",
+      "size_bytes": 9506,
+      "sha256": "cf281a66447bdd228ffd8d2b0798fe6ad1588a7fc21584c7d86d2d6eb511b8a3",
+      "category": "valid",
+      "description": "3D geopotential volume (4x8x8) compressed with LZ4.",
+      "expected_outcome": "Pass",
+      "error_code": null
+    },
+    {
+      "id": "GV-03",
+      "filename": "gv03_valid_multigen_append.wx1",
+      "size_bytes": 33431,
+      "sha256": "4179eb6f6794adfaf2750f4116166f6b1d58efe71a61c0632f556046bf22c425",
+      "category": "valid",
+      "description": "3 append generations with evolving time dimension (3x2 grid).",
+      "expected_outcome": "Pass",
+      "error_code": null
+    },
+    {
+      "id": "GV-04",
+      "filename": "gv04_valid_special_floats.wx1",
+      "size_bytes": 8946,
+      "sha256": "d56a1c26b426a6e456fee4f8196fb4d2c7e38fc2ec61fb74e732311281891f83",
+      "category": "valid",
+      "description": "IEEE-754 special floats preservation: NaN, +Inf, -Inf, -0.0, +0.0, 1.0.",
+      "expected_outcome": "Pass",
+      "error_code": null
+    },
+    {
+      "id": "GV-05",
+      "filename": "gv05_corrupt_magic.wx1",
+      "size_bytes": 9150,
+      "sha256": "633162aa9f4fe13769083101c9da62ddfa3717b87e97162f04981613ad0bba31",
+      "category": "corrupt",
+      "description": "Container header magic mutated from 'WX1\\0' to 'BAD\\0'.",
+      "expected_outcome": "Fail",
+      "error_code": "InvalidMagic"
+    },
+    {
+      "id": "GV-06",
+      "filename": "gv06_corrupt_footer_crc.wx1",
+      "size_bytes": 9150,
+      "sha256": "059d8f458bcdf1e904f23eefa22fdd033ba24a301964f6603300853e16a943cd",
+      "category": "corrupt",
+      "description": "Damaged CRC32C checksum in the generation commit footer.",
+      "expected_outcome": "Fail",
+      "error_code": "GenerationFooterInvalid"
+    },
+    {
+      "id": "GV-07",
+      "filename": "gv07_corrupt_chunk_blake3.wx1",
+      "size_bytes": 9150,
+      "sha256": "e8bb63f703bd5d947e827addcecb827662d3756073c9717094cce2824db9b9cc",
+      "category": "corrupt",
+      "description": "Single-bit flip inside compressed chunk payload (byte 180).",
+      "expected_outcome": "Fail",
+      "error_code": "ChecksumMismatch"
+    },
+    {
+      "id": "GV-08",
+      "filename": "gv08_corrupt_truncated_payload.wx1",
+      "size_bytes": 9100,
+      "sha256": "e3860f86b0d3bbde5005d3dc6310626ef488fe0c033ad0e514410a5569dca04e",
+      "category": "corrupt",
+      "description": "File truncated by 50 bytes mid-container.",
+      "expected_outcome": "Fail",
+      "error_code": "UnexpectedEof"
+    },
+    {
+      "id": "GV-09",
+      "filename": "gv09_corrupt_unsupported_codec.wx1",
+      "size_bytes": 9150,
+      "sha256": "f15b120441ce545bdad696ecbdabb55418bf7ecb7495b33b0400806e6082c645",
+      "category": "corrupt",
+      "description": "Chunk descriptor claiming unsupported codec ID 0x99.",
+      "expected_outcome": "Fail",
+      "error_code": "UnsupportedCodec"
+    },
+    {
+      "id": "GV-10",
+      "filename": "gv10_malicious_path_traversal.wx1",
+      "size_bytes": 9150,
+      "sha256": "38afce1079ef918feadfe7f9026003bdbdc8195a7bd68088939e4a9401ce0e40",
+      "category": "security",
+      "description": "Scientific metadata manifest containing directory traversal variable path ('../').",
+      "expected_outcome": "Fail",
+      "error_code": "InvalidVariableName"
+    },
+    {
+      "id": "GV-11",
+      "filename": "gv11_malicious_decompression_bomb.wx1",
+      "size_bytes": 9150,
+      "sha256": "2e09f95ab9204100f76e3162d12a848339bff46a03dbfaa80740cf06df90227f",
+      "category": "security",
+      "description": "Chunk descriptor declaring raw_len of 100 MiB (> 64 MiB MAX_CHUNK_BYTES limit).",
+      "expected_outcome": "Fail",
+      "error_code": "ChunkTooLarge"
+    }
+  ]
+}

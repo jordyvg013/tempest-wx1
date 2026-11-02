@@ -403,7 +403,32 @@ fn test_gv04_valid_special_floats() {
         data: &raw_bytes,
         codec: ChunkCodec::Zstandard,
     };
-    let metadata = Metadata::new("special-floats-dataset");
+
+    let mut model = ScientificDataset::new();
+    model.dimensions = vec![Dimension {
+        name: "index".to_owned(),
+        length: 6,
+        role: DimensionRole::Other,
+    }];
+    model.variables = vec![Variable {
+        name: "special_floats".to_owned(),
+        group: "/".to_owned(),
+        data_type: DataType::F32,
+        byte_order: PayloadByteOrder::LittleEndian,
+        dimensions: vec!["index".to_owned()],
+        chunk_shape: vec![6],
+        fill_value: None,
+        missing_value: None,
+        attributes: BTreeMap::new(),
+        chunks: vec![ArrayChunkRef {
+            chunk_id: 44,
+            origin: vec![0],
+            shape: vec![6],
+        }],
+        grid_mapping: None,
+    }];
+
+    let metadata = Metadata::new("special-floats-dataset").with_scientific_model(model);
 
     let mut file = File::create(&path).unwrap();
     write_generation_container(
@@ -415,9 +440,18 @@ fn test_gv04_valid_special_floats() {
     .unwrap();
 
     let mut read_file = File::open(&path).unwrap();
-    let snapshot = open_generation_snapshot(&mut read_file).unwrap();
-    let decoded = snapshot.read_chunk(&mut read_file, 44).unwrap();
-    assert_eq!(decoded.len(), 24);
+    let snapshot = open_scientific_snapshot(&mut read_file).unwrap();
+    let array = snapshot
+        .read_array_slice(
+            &mut read_file,
+            "/special_floats",
+            &ArraySelection {
+                start: vec![0],
+                count: vec![6],
+            },
+        )
+        .unwrap();
+    assert_eq!(array.data.len(), 24);
 }
 
 #[test]
@@ -510,32 +544,49 @@ fn test_gv09_corrupt_unsupported_codec() {
 
 #[test]
 fn test_gv10_malicious_path_traversal() {
-    let mut model = ScientificDataset::new();
-    model.dimensions = vec![Dimension {
-        name: "time".to_owned(),
-        length: 1,
-        role: DimensionRole::Time,
-    }];
-    model.variables = vec![Variable {
-        name: "../../etc/shadow".to_owned(),
-        group: "/".to_owned(),
-        data_type: DataType::F32,
-        byte_order: PayloadByteOrder::LittleEndian,
-        dimensions: vec!["time".to_owned()],
-        chunk_shape: vec![1],
-        fill_value: None,
-        missing_value: None,
-        attributes: BTreeMap::new(),
-        chunks: Vec::new(),
-        grid_mapping: None,
-    }];
+    let path = fixtures_dir().join("gv10_malicious_path_traversal.wx1");
+    let mut bytes = build_gv01_bytes();
 
-    assert!(model.validate().is_err());
+    // Replace the variable name "t2m" with malicious traversal "../"
+    let t2m_pos = bytes
+        .windows(3)
+        .position(|w| w == b"t2m")
+        .expect("variable name t2m should be present in metadata");
+    bytes[t2m_pos..t2m_pos + 3].copy_from_slice(b"../");
+    std::fs::write(&path, &bytes).unwrap();
+
+    let mut file = File::open(&path).unwrap();
+    let res = open_scientific_snapshot(&mut file);
+    assert!(
+        res.is_err(),
+        "malicious variable name '../' must be rejected"
+    );
 }
 
 #[test]
 fn test_gv11_malicious_decompression_bomb() {
-    let payload = vec![0u8; 16];
-    let res = wx1_format::read_chunk_directory(&mut Cursor::new(&payload));
-    assert!(res.is_err());
+    let path = fixtures_dir().join("gv11_malicious_decompression_bomb.wx1");
+    let mut bytes = build_gv01_bytes();
+
+    // Find the raw_len 1024 (0x00000400u64) in the chunk descriptor and change to 100 MiB (0x06400000u64)
+    // which exceeds MAX_CHUNK_BYTES (64 MiB).
+    let target = 1024u64.to_le_bytes();
+    let bomb_len = (100 * 1024 * 1024u64).to_le_bytes();
+    let mut replaced = false;
+    for i in (64..bytes.len() - 48).rev() {
+        if bytes[i..i + 8] == target {
+            bytes[i..i + 8].copy_from_slice(&bomb_len);
+            replaced = true;
+            break;
+        }
+    }
+    assert!(replaced, "should find and replace chunk descriptor raw_len");
+    std::fs::write(&path, &bytes).unwrap();
+
+    let mut file = File::open(&path).unwrap();
+    let res = open_generation_snapshot(&mut file);
+    assert!(
+        matches!(res, Err(ChunkIoError::ChunkTooLarge)),
+        "100 MiB declared uncompressed chunk must be rejected with ChunkTooLarge"
+    );
 }
