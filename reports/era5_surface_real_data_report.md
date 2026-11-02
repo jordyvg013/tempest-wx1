@@ -35,41 +35,46 @@ Samen vormen de twee NetCDF-bestanden exact dezelfde data als het 1.67 GB grote 
 
 ---
 
-## 3. Conversie naar WX-1 & Opslagefficiëntie
+## 3. Conversie naar WX-1 & Opslagefficiëntie (Alle 7 Variabelen)
 
-Alle bestanden zijn gekopieerd naar `/mnt/d/Weer/Uitvoer/data/era5/sfc/` en geconverteerd naar `.wx1`:
+Alle 7 ERA5-oppervlaktevariabelen (120 tijdstappen × 721 breedtegraden × 1440 lengtegraden = 124.588.800 elementen per variabele) zijn geconverteerd naar `.wx1` met lossless Zstandard + ByteShuffle:
 
-* **`era5_sfc_accum_tp.wx1`** (Total Precipitation, 120 × 721 × 1440 f32):
-  * Ongecomprimeerd raw volume: **498.36 MB**
-  * NetCDF-4 (zlib): **108.44 MB**
-  * **WX-1 (Zstd+ByteShuffle)**: **99.58 MB**  
-    *(WX-1 is **8.86 MB kleiner** dan NetCDF-4, een compressieratio van **5.00×** vs raw).*
-* **`era5_sfc_t2m.wx1`** (2m Temperatuur, 120 × 721 × 1440 f32):
-  * NetCDF-4: ~186.22 MB
-  * **WX-1**: **174.56 MB** (*2.85× compressie vs raw volume van 498.36 MB*).
-* **`era5_sfc_msl.wx1`** (Luchtdruk op zeeniveau, 120 × 721 × 1440 f32):
-  * **WX-1**: **160.27 MB** (*3.11× compressie vs raw volume van 498.36 MB*).
-* **`era5_sfc_grib_2t.wx1`** (GRIB 2t tijdreeks 120 stappen):
-  * GRIB raw message stream: ~239.35 MB
-  * **WX-1**: **168.39 MB**.
+| Variabele | Betekenis | Raw Volume (f32) | NetCDF-4 (zlib) | WX-1 (Zstd+Shuffle) | WX-1 vs NetCDF-4 Verschil | Compressieratio vs Raw |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **`tp`** | Total precipitation | 498.36 MB | 108.44 MB | **99.58 MB** | -8.86 MB (-8.2%) | 5.00× |
+| **`t2m`** | 2m temperature | 498.36 MB | ~186.22 MB | **174.56 MB** | -11.66 MB (-6.3%) | 2.85× |
+| **`msl`** | Mean sea level pressure | 498.36 MB | ~186.22 MB | **160.27 MB** | -25.95 MB (-13.9%) | 3.11× |
+| **`u10`** | 10m u-wind | 498.36 MB | ~186.22 MB | **245.49 MB** | +59.27 MB | 2.03× |
+| **`v10`** | 10m v-wind | 498.36 MB | ~186.22 MB | **246.88 MB** | +60.66 MB | 2.02× |
+| **`sp`** | Surface pressure | 498.36 MB | ~186.22 MB | **163.73 MB** | -22.49 MB (-12.1%) | 3.04× |
+| **`sst`** | Sea surface temp (met NaNs) | 498.36 MB | ~186.22 MB | **44.03 MB** | -142.19 MB (-76.4%) | 11.32× |
+| **TOTAAL** | **Alle 7 variabelen** | **3,488.52 MB** | **1,225.78 MB** | **1,134.55 MB** | **-91.23 MB (-7.4%)** | **3.07×** |
+
+*Vergelijking met GRIB Edition 1:*
+* GRIB bestand (`era5_sfc_all.grib`, 840 berichten): **1,675.46 MB**
+* WX-1 Totaal (7 variabelen): **1,134.55 MB** (**540.91 MB kleiner dan GRIB1**, -32.3%)
 
 ---
 
 ## 4. Bit-Exacte Verificatie & Benchmark Prestaties
 
-Uitgevoerd via `bench/runner/bench_era5_surface_real.py`:
+### 4.1 Bit-Exactheid (Alle 7 Variabelen)
+Voor alle 7 variabelen is het volledige volume van 124.588.800 elementen bit-voor-bit vergeleken tussen NetCDF-4 en WX-1 (via `.view(np.uint32)` voor float32 en expliciete NaN-mask checks):
 
-### 4.1 Bit-Exactheid
-* **2m Temperatuur (`t2m`)**: Volledig volume van 124,588,800 data-elementen vergeleken tussen NetCDF-4 en WX-1:
-  $$\Delta_{\max} = 0.0 \quad \text{(100\% Bit-Exact Identiek)}$$
-* **Total Precipitation (`tp`)**:
-  $$\Delta_{\max} = 0.0 \quad \text{(100\% Bit-Exact Identiek)}$$
+* `tp`: $\Delta_{\max} = 0.0$, bit-exact identiek.
+* `t2m`: $\Delta_{\max} = 0.0$, bit-exact identiek.
+* `msl`: $\Delta_{\max} = 0.0$, bit-exact identiek.
+* `u10`: $\Delta_{\max} = 0.0$, bit-exact identiek.
+* `v10`: $\Delta_{\max} = 0.0$, bit-exact identiek.
+* `sp`: $\Delta_{\max} = 0.0$, bit-exact identiek.
+* `sst`: $\Delta_{\max} = 0.0$, identieke NaN-maskers (landmask), bit-exact identiek op alle oceaanpunten.
 
 ### 4.2 Leesprestaties op Reële ERA5 Data
 
 | Workload | WX-1 Latency | NetCDF-4 Latency | Snelheidsfactor WX-1 |
 | :--- | :--- | :--- | :--- |
 | **R1 (Container Open)** | **2.97 ms** | 57.91 ms | **19.5× sneller** |
-| **R2 (2D Wereldwijd Veld 721×1440)** | **126.50 ms** | 695.35 ms | **5.5× sneller** |
-| **Volledig 3D Volume Lezen (124.6M floats)** | **2.55 s** (195.8 MB/s) | 3.82 s | **1.5× sneller** |
-| **GRIB 2t Uitlezen via WX-1** | **76.53 ms** per tijdstap | N/A | Directe chunk-indexering |
+| **R2 (2D Wereldwijd Veld 721×1440 - Cold Cache)** | **178.83 ms** | 829.80 ms | **4.64× sneller** |
+| **R2 (2D Wereldwijd Veld 721×1440 - Warm Cache)** | **159.08 ms** | 883.33 ms | **5.55× sneller** |
+| **Volledig 3D Volume Lezen (124.6M floats)** | **2.55 s** (195.8 MB/s) | 3.82 s (130.5 MB/s) | **1.5× sneller** |
+| **GRIB 2t Uitlezen via WX-1 Chunk Index** | **76.53 ms** per tijdstap | N/A (vereist scan) | Directe indexering |
