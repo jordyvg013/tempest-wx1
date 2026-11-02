@@ -58,5 +58,6 @@ These are planned identifiers, not accepted decisions. Create/review each ADR af
 - [0030 — External format interoperability (GRIB2, NetCDF-4, Zarr) and lossless metadata preservation](0030-external-format-interoperability-and-metadata-preservation.md) — accepted and implemented (Fase 4).
 - [0031 — Fuzzing, independent test vectors, power-loss resilience, and security hardening](0031-fuzzing-test-vectors-power-loss-and-security.md) — accepted and implemented (Fase 4).
 - [0032 — Stable C ABI, cbindgen, and Foreign Function Interface](0032-stable-c-abi-cbindgen-and-ffi.md) — accepted and implemented (Fase 4).
+- [0033 — GPU and multi-device integration, non-blocking transfer, and bit-exact restart](0033-gpu-multi-device-integration-and-restart.md) — accepted and implemented (Fase 4).
 - [0034 — Expanded scientific chunk and metadata limits](0034-expanded-chunk-and-metadata-limits.md) — accepted and implemented (Fase 2).
 
