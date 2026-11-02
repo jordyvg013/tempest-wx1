@@ -39,7 +39,10 @@ except ImportError:
 else:
     _CORE_IMPORT_ERROR = None
 
+__version__ = "0.1.0"
+
 __all__ = [
+    "__version__",
     "Wx1File",
     "AsyncWriter",
     "open_file",
