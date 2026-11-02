@@ -20,6 +20,8 @@ dask = ["numpy>=1.26", "xarray>=2024.1", "dask[array]>=2024.1"]
 netcdf = ["numpy>=1.26", "xarray>=2024.1", "netCDF4>=1.6"]
 zarr = ["numpy>=1.26", "xarray>=2024.1", "zarr>=2.17"]
 grib2 = ["numpy>=1.26", "xarray>=2024.1", "cfgrib>=0.9.15", "eccodes>=2.38"]
+gpu = ["jax[cuda12]>=0.12"]
+cuda = ["jax[cuda12]>=0.12"]
 all = [
   "numpy>=1.26",
   "xarray>=2024.1",
@@ -28,6 +30,7 @@ all = [
   "zarr>=2.17",
   "cfgrib>=0.9.15",
   "eccodes>=2.38",
+  "jax[cuda12]>=0.12",
 ]
 
 [project.entry-points."xarray.backends"]
