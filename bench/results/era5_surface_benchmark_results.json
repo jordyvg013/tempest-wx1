@@ -1,0 +1,29 @@
+{
+  "dataset": "ECMWF ERA5 Surface Reanalysis (October 2026)",
+  "resolution": "0.25 deg global (721 x 1440)",
+  "timesteps": 120,
+  "storage": {
+    "grib_total_mb": 1675.46,
+    "netcdf_instant_mb": 1117.34,
+    "netcdf_accum_mb": 108.44,
+    "wx1_tp_mb": 99.58,
+    "wx1_t2m_mb": 174.56,
+    "wx1_msl_mb": 160.27,
+    "wx1_vs_netcdf_tp_ratio": 1.089
+  },
+  "bit_exactness": {
+    "t2m_max_diff": 0.0,
+    "tp_max_diff": 0.0,
+    "bit_exact": true
+  },
+  "latency_ms": {
+    "R1_open_wx1": 2.974,
+    "R1_open_netcdf": 57.911,
+    "R2_slice_wx1": 126.5,
+    "R2_slice_netcdf": 695.35,
+    "R4_point_wx1": 1457.34,
+    "R4_point_netcdf": 0.2,
+    "R5_bbox_wx1": 360.21,
+    "R5_bbox_netcdf": 0.2
+  }
+}

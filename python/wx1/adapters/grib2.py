@@ -200,15 +200,46 @@ def from_grib(
         ni = int(attrs.get("grib:Ni", 0))
         nj = int(attrs.get("grib:Nj", 0))
 
-        # Check multi-level / multi-member or single level
+        # Check multi-level / multi-member / timeseries or single level
         num_levels = len(selected_messages)
         all_members = []
+        all_times = []
+        all_levels = []
         for gid, _ in selected_messages:
             try:
                 all_members.append(int(eccodes.codes_get(gid, "perturbationNumber")))
             except Exception:
                 pass
+            try:
+                d = int(eccodes.codes_get(gid, "validityDate"))
+            except Exception:
+                try:
+                    d = int(eccodes.codes_get(gid, "dataDate"))
+                except Exception:
+                    d = 0
+            try:
+                t = int(eccodes.codes_get(gid, "validityTime"))
+            except Exception:
+                try:
+                    t = int(eccodes.codes_get(gid, "dataTime"))
+                except Exception:
+                    t = 0
+            try:
+                s = int(eccodes.codes_get(gid, "step"))
+            except Exception:
+                try:
+                    s = int(eccodes.codes_get(gid, "forecastTime"))
+                except Exception:
+                    s = 0
+            all_times.append((d, t, s))
+            try:
+                lvl = eccodes.codes_get(gid, "level")
+                all_levels.append(int(lvl))
+            except Exception:
+                all_levels.append(0)
+
         is_ensemble = len(all_members) == num_levels and len(set(all_members)) > 1
+        is_timeseries = len(set(all_times)) > 1 and len(set(all_levels)) <= 1
 
         if num_levels > 1:
             if is_ensemble:
@@ -217,6 +248,30 @@ def from_grib(
                         return int(eccodes.codes_get(item[0], "perturbationNumber"))
                     except Exception:
                         return 0
+            elif is_timeseries:
+                def _msg_sort_key(item):
+                    try:
+                        d = int(eccodes.codes_get(item[0], "validityDate"))
+                    except Exception:
+                        try:
+                            d = int(eccodes.codes_get(item[0], "dataDate"))
+                        except Exception:
+                            d = 0
+                    try:
+                        t = int(eccodes.codes_get(item[0], "validityTime"))
+                    except Exception:
+                        try:
+                            t = int(eccodes.codes_get(item[0], "dataTime"))
+                        except Exception:
+                            t = 0
+                    try:
+                        s = int(eccodes.codes_get(item[0], "step"))
+                    except Exception:
+                        try:
+                            s = int(eccodes.codes_get(item[0], "forecastTime"))
+                        except Exception:
+                            s = 0
+                    return (d, t, s)
             else:
                 def _msg_sort_key(item):
                     try:
@@ -225,16 +280,10 @@ def from_grib(
                         return 0
             selected_messages.sort(key=_msg_sort_key)
 
-        all_levels = []
         sorted_members = []
         data_slices = []
 
         for gid, _ in selected_messages:
-            try:
-                lvl = eccodes.codes_get(gid, "level")
-                all_levels.append(int(lvl))
-            except Exception:
-                all_levels.append(0)
             if is_ensemble:
                 try:
                     sorted_members.append(int(eccodes.codes_get(gid, "perturbationNumber")))
@@ -253,6 +302,9 @@ def from_grib(
             v_dim = "member"
             v_role = "ensemble"
             attrs["grib:ensemble_members"] = ",".join(str(m) for m in sorted_members)
+        elif is_timeseries:
+            v_dim = "time"
+            v_role = "time"
         elif "soil" in tol:
             v_dim = "soil_layer"
             v_role = "soil_layer"
