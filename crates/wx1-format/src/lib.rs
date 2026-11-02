@@ -3672,41 +3672,38 @@ impl GenerationSnapshot {
             }
             // Caveman + Ponytail: do not spawn threads if batch is small or total payload < 512 KiB.
             // Spawning threads for small payloads introduces thread spawn/synchronization overhead.
-            let decoded_batch: Vec<Result<Vec<u8>, ChunkIoError>> =
-                if raw_batch.len() <= 2 || total_stored < 512 * 1024 {
-                    raw_batch
+            let decoded_batch: Vec<Result<Vec<u8>, ChunkIoError>> = if raw_batch.len() <= 2
+                || total_stored < 512 * 1024
+            {
+                raw_batch
+                    .iter()
+                    .map(|(desc, stored)| {
+                        verify_and_decode_generation_chunk_mode(*desc, stored, verify_blake3)
+                    })
+                    .collect()
+            } else {
+                std::thread::scope(|s| {
+                    let handles: Vec<_> = raw_batch
                         .iter()
-                        .map(|(desc, stored)| {
-                            verify_and_decode_generation_chunk_mode(*desc, stored, verify_blake3)
+                        .map(|(descriptor, stored)| {
+                            let desc = *descriptor;
+                            s.spawn(move || {
+                                verify_and_decode_generation_chunk_mode(desc, stored, verify_blake3)
+                            })
+                        })
+                        .collect();
+                    handles
+                        .into_iter()
+                        .map(|h| {
+                            h.join().unwrap_or_else(|_| {
+                                Err(ChunkIoError::Decompression(
+                                    "worker thread panicked".to_owned(),
+                                ))
+                            })
                         })
                         .collect()
-                } else {
-                    std::thread::scope(|s| {
-                        let handles: Vec<_> = raw_batch
-                            .iter()
-                            .map(|(descriptor, stored)| {
-                                let desc = *descriptor;
-                                s.spawn(move || {
-                                    verify_and_decode_generation_chunk_mode(
-                                        desc,
-                                        stored,
-                                        verify_blake3,
-                                    )
-                                })
-                            })
-                            .collect();
-                        handles
-                            .into_iter()
-                            .map(|h| {
-                                h.join().unwrap_or_else(|_| {
-                                    Err(ChunkIoError::Decompression(
-                                        "worker thread panicked".to_owned(),
-                                    ))
-                                })
-                            })
-                            .collect()
-                    })
-                };
+                })
+            };
             for res in decoded_batch {
                 results.push(res?);
             }
