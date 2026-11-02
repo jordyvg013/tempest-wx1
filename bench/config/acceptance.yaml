@@ -1,0 +1,69 @@
+# WX-1 cross-format acceptance thresholds — frozen before first formal comparison
+# Applies to the Fase-2 cross-format suite (ADR 0021), not to the historical
+# single-format internal Cargo microbenchmark (ADR 0019).
+config_version: 1
+status: frozen_pre_measurement
+scope: cross_format_fase_2
+comparison_rules:
+  require_same_dataset_semantics: true
+  require_same_precision_or_error_bound: true
+  keep_lossless_and_lossy_separate: true
+  report_cold_and_warm_separately: true
+  do_not_adjust_thresholds_after_results: true
+
+read:
+  R1_open_time:
+    metric: ratio_100gb_to_1gb
+    max_ratio: 2.0
+    note: Compare same format/profile, hardware, filesystem, cache state and metadata/index semantics.
+  R2_single_field:
+    min_speedup_vs_each_reference: 2.0
+    references: [GRIB2, Zarr3]
+    states: [cold, warm]
+    comparison: WX1_latency_must_be_at_most_reference_latency_divided_by_speedup
+
+size:
+  equal_error_bound:
+    must_be_smaller_than: GRIB2_CCSDS
+
+write:
+  W2_append_per_timestep:
+    require_append_only: true
+    require_no_rewrite_of_prior_payloads: true
+    report_per_step_latency_and_bytes_written: true
+  W5_cubed_sphere_model_step:
+    max_io_stall_fraction_of_compute_only_step: 0.05
+  W6_async_checkpoint:
+    report_against: [compute_only, synchronous_WX1, asynchronous_WX1, asynchronous_Zarr3, asynchronous_NetCDF4]
+    report_step_duration_stall_queue_depth_backpressure_durable_checkpoint_time_ram_vram: true
+    max_async_wx1_step_overhead_fraction_vs_compute_only: 0.05
+
+downstream:
+  D4_async_model:
+    max_step_duration_overhead_fraction_vs_compute_only: 0.05
+    must_not_be_slower_than: Zarr3
+    execution: CPU_and_GPU_after_GPU_gate
+
+durability:
+  required_modes: [buffered, durable]
+  durable_mode_must_document_actual_sync_guarantee: true
+  never_treat_flush_as_fsync: true
+  compare_only_equivalent_durability_guarantees: true
+  W2_and_W4_report_both_modes: true
+
+recovery_and_correctness:
+  C1_last_fully_durable_committed_step_must_remain_valid: true
+  C2_detect_all_declared_single_byte_data_and_index_corruptions: true
+  W4_restart_bit_exact_including_prng_state: true
+
+statistics:
+  full_runs_minimum: 5
+  cold_read_repetitions_minimum: 30
+  warm_read_repetitions_minimum: 30
+  first_run_is_warmup: true
+
+notes:
+  - These are acceptance targets, not achieved results.
+  - A process kill (-9) is not a physical power-loss test.
+  - The v0.4.3 internal benchmark excluded fsync and is not a durable-write result.
+  - If a format cannot provide a matching durability mode, report it as incomparable for that durability comparison.

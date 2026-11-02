@@ -1,0 +1,23 @@
+# Initial step-1 adapter declarations; capability gaps are reported per run.
+version: 1
+formats:
+  - id: wx1
+    label: WX-1
+    adapter: bench.adapters.wx1.WX1Adapter
+    extra: native phase-1 wx1 package
+    comparison_class: lossless
+  - id: grib2
+    label: GRIB2/ecCodes
+    adapter: bench.adapters.grib2.GRIB2Adapter
+    extra: grib2
+    comparison_class: bounded_error
+  - id: netcdf4
+    label: NetCDF4
+    adapter: bench.adapters.netcdf4.NetCDF4Adapter
+    extra: netcdf
+    comparison_class: lossless
+  - id: zarr3
+    label: Zarr 3
+    adapter: bench.adapters.zarr3.Zarr3Adapter
+    extra: zarr
+    comparison_class: lossless

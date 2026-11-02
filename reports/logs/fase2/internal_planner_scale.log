@@ -1,0 +1,19 @@
+=== PLANNER SCALE BENCHMARK START 2026-11-01T22:54:03+01:00 ===
+Loadavg before:
+0.31 0.21 0.22 1/260 9157
+--- Building optimized benchmark binary ---
+   Compiling wx1-format v0.1.0 (/mnt/d/AI/weer-ai/Tempest/WX-1/crates/wx1-format)
+    Finished `bench` profile [optimized] target(s) in 3.51s
+  Executable benches/wx1_performance.rs (/home/j_ord/WX-1-TESTS/target/release/deps/wx1_performance-e68c56dee41b9f7a)
+Benchmark binary: /home/j_ord/WX-1-TESTS/target/release/deps/wx1_performance-e68c56dee41b9f7a
+--- 1. Case: planner (4096 chunks snapshot baseline) ---
+case=planner dimensions=2048x2048 chunks=4096 chunk_shape=32x32 selection=256x256 selected_chunks=81 open_validate_ms=73.140 plan_median_ns=7213 plans_per_repetition=200 selection_read_median_ms=1.136 selection_read_mib_s=220.00 peak_rss_mib=21.4
+--- 2. Case: planner-scale-4096 (validated in-memory) ---
+case=planner-scale chunks=4096 validate_ms=0.755 serialize_ms=1.400 encoded_bytes=64166 selected_chunks=81 plan_median_ns=7308 plan_median_us=7.308 peak_rss_mib=3.6
+--- 3. Case: planner-scale-65536 (validated in-memory) ---
+case=planner-scale chunks=65536 validate_ms=19.066 serialize_ms=32.379 encoded_bytes=1043754 selected_chunks=81 plan_median_ns=165055 plan_median_us=165.055 peak_rss_mib=18.7
+--- 4. Case: planner-scale-1048576 (ADR 0034 2^20 chunks validated & CBOR serialized) ---
+case=planner-scale chunks=1048576 validate_ms=278.105 serialize_ms=496.918 encoded_bytes=18724650 selected_chunks=81 plan_median_ns=7798410 plan_median_us=7798.410 peak_rss_mib=276.6
+Loadavg after:
+0.45 0.24 0.23 1/260 9261
+=== PLANNER SCALE BENCHMARK FINISHED 2026-11-01T22:54:10+01:00 ===

@@ -1,0 +1,72 @@
+=== PYTHON SUITE START 2026-11-01T22:38:41+01:00 ===
+--- 1. Editable install of python package with all extras ---
+Obtaining file:///mnt/d/AI/weer-ai/Tempest/WX-1/python
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Checking if build backend supports build_editable: started
+  Checking if build backend supports build_editable: finished with status 'done'
+  Getting requirements to build editable: started
+  Getting requirements to build editable: finished with status 'done'
+  Preparing editable metadata (pyproject.toml): started
+  Preparing editable metadata (pyproject.toml): finished with status 'done'
+Requirement already satisfied: numpy>=1.26 in /home/j_ord/miniconda3/envs/Tempest/lib/python3.12/site-packages (from wx1==0.1.0) (2.5.4)
+Requirement already satisfied: xarray>=2024.1 in /home/j_ord/miniconda3/envs/Tempest/lib/python3.12/site-packages (from wx1==0.1.0) (2026.9.0)
+Requirement already satisfied: dask>=2024.1 in /home/j_ord/miniconda3/envs/Tempest/lib/python3.12/site-packages (from dask[array]>=2024.1; extra == "dask"->wx1==0.1.0) (2026.8.0)
+Requirement already satisfied: cfgrib>=0.9.15 in /home/j_ord/miniconda3/envs/Tempest/lib/python3.12/site-packages (from wx1==0.1.0) (0.9.15.1)
+Requirement already satisfied: eccodes>=2.38 in /home/j_ord/miniconda3/envs/Tempest/lib/python3.12/site-packages (from wx1==0.1.0) (2.50.0)
+Requirement already satisfied: netcdf4>=1.6 in /home/j_ord/miniconda3/envs/Tempest/lib/python3.12/site-packages (from wx1==0.1.0) (1.7.5.1.post1)
+Requirement already satisfied: zarr>=2.17 in /home/j_ord/miniconda3/envs/Tempest/lib/python3.12/site-packages (from wx1==0.1.0) (3.4.2)
+Requirement already satisfied: attrs>=19.2 in /home/j_ord/miniconda3/envs/Tempest/lib/python3.12/site-packages (from cfgrib>=0.9.15->wx1==0.1.0) (26.1.0)
+Requirement already satisfied: click in /home/j_ord/miniconda3/envs/Tempest/lib/python3.12/site-packages (from cfgrib>=0.9.15->wx1==0.1.0) (8.5.0)
+Requirement already satisfied: cloudpickle>=3.0.0 in /home/j_ord/miniconda3/envs/Tempest/lib/python3.12/site-packages (from dask>=2024.1->dask[array]>=2024.1; extra == "dask"->wx1==0.1.0) (3.1.2)
+Requirement already satisfied: fsspec>=2021.09.0 in /home/j_ord/miniconda3/envs/Tempest/lib/python3.12/site-packages (from dask>=2024.1->dask[array]>=2024.1; extra == "dask"->wx1==0.1.0) (2026.9.0)
+Requirement already satisfied: packaging>=20.0 in /home/j_ord/miniconda3/envs/Tempest/lib/python3.12/site-packages (from dask>=2024.1->dask[array]>=2024.1; extra == "dask"->wx1==0.1.0) (26.3)
+Requirement already satisfied: partd>=1.4.0 in /home/j_ord/miniconda3/envs/Tempest/lib/python3.12/site-packages (from dask>=2024.1->dask[array]>=2024.1; extra == "dask"->wx1==0.1.0) (1.4.2)
+Requirement already satisfied: pyyaml>=5.4.1 in /home/j_ord/miniconda3/envs/Tempest/lib/python3.12/site-packages (from dask>=2024.1->dask[array]>=2024.1; extra == "dask"->wx1==0.1.0) (6.0.3)
+Requirement already satisfied: toolz>=0.12.0 in /home/j_ord/miniconda3/envs/Tempest/lib/python3.12/site-packages (from dask>=2024.1->dask[array]>=2024.1; extra == "dask"->wx1==0.1.0) (1.2.0)
+Requirement already satisfied: cffi in /home/j_ord/miniconda3/envs/Tempest/lib/python3.12/site-packages (from eccodes>=2.38->wx1==0.1.0) (2.1.1)
+Requirement already satisfied: findlibs in /home/j_ord/miniconda3/envs/Tempest/lib/python3.12/site-packages (from eccodes>=2.38->wx1==0.1.0) (0.1.4)
+Requirement already satisfied: cftime in /home/j_ord/miniconda3/envs/Tempest/lib/python3.12/site-packages (from netcdf4>=1.6->wx1==0.1.0) (1.6.6.1)
+Requirement already satisfied: certifi in /home/j_ord/miniconda3/envs/Tempest/lib/python3.12/site-packages (from netcdf4>=1.6->wx1==0.1.0) (2026.10.23)
+Requirement already satisfied: locket in /home/j_ord/miniconda3/envs/Tempest/lib/python3.12/site-packages (from partd>=1.4.0->dask>=2024.1->dask[array]>=2024.1; extra == "dask"->wx1==0.1.0) (1.0.0)
+Requirement already satisfied: pandas>=2.2 in /home/j_ord/miniconda3/envs/Tempest/lib/python3.12/site-packages (from xarray>=2024.1->wx1==0.1.0) (3.1.0)
+Requirement already satisfied: python-dateutil>=2.9.0 in /home/j_ord/miniconda3/envs/Tempest/lib/python3.12/site-packages (from pandas>=2.2->xarray>=2024.1->wx1==0.1.0) (4.0.0)
+Requirement already satisfied: tzdata in /home/j_ord/miniconda3/envs/Tempest/lib/python3.12/site-packages (from python-dateutil>=2.9.0->pandas>=2.2->xarray>=2024.1->wx1==0.1.0) (2026.6)
+Requirement already satisfied: donfig>=0.8 in /home/j_ord/miniconda3/envs/Tempest/lib/python3.12/site-packages (from zarr>=2.17->wx1==0.1.0) (0.8.1.post1)
+Requirement already satisfied: google-crc32c>=1.5 in /home/j_ord/miniconda3/envs/Tempest/lib/python3.12/site-packages (from zarr>=2.17->wx1==0.1.0) (1.9.0)
+Requirement already satisfied: msgspec>=0.19 in /home/j_ord/miniconda3/envs/Tempest/lib/python3.12/site-packages (from zarr>=2.17->wx1==0.1.0) (0.22.0)
+Requirement already satisfied: numcodecs!=0.17.0,>=0.16.6 in /home/j_ord/miniconda3/envs/Tempest/lib/python3.12/site-packages (from zarr>=2.17->wx1==0.1.0) (0.17.1)
+Requirement already satisfied: typing-extensions>=4.14 in /home/j_ord/miniconda3/envs/Tempest/lib/python3.12/site-packages (from zarr>=2.17->wx1==0.1.0) (4.16.0)
+Requirement already satisfied: pycparser in /home/j_ord/miniconda3/envs/Tempest/lib/python3.12/site-packages (from cffi->eccodes>=2.38->wx1==0.1.0) (3.12)
+Building wheels for collected packages: wx1
+  Building editable for wx1 (pyproject.toml): started
+  Building editable for wx1 (pyproject.toml): finished with status 'done'
+  Created wheel for wx1: filename=wx1-0.1.0-cp312-cp312-linux_x86_64.whl size=9278 sha256=a0bbf098a1c1316bfa08d12723ab291568409c6f6f141a0308a8b111248ce356
+  Stored in directory: /tmp/pip-ephem-wheel-cache-gj5rfbrd/wheels/7c/5f/ad/67abd8ece15a0f8db8f5494fec52c76fc27b92e6cbca12ceac
+Successfully built wx1
+Installing collected packages: wx1
+  Attempting uninstall: wx1
+    Found existing installation: wx1 0.1.0
+    Uninstalling wx1-0.1.0:
+      Successfully uninstalled wx1-0.1.0
+Successfully installed wx1-0.1.0
+WX1_GRIB2_FIXTURE is set to: /home/j_ord/wx1_fixtures/ecmwf_2t.grib2
+--- 2. Full pytest suite ---
+..ss.....................                                                [100%]
+=========================== short test summary info ============================
+SKIPPED [1] python/tests/test_external_adapters.py:33: Zarr is installed; live local Zarr fixture test is required instead
+SKIPPED [1] python/tests/test_external_adapters.py:40: cfgrib is installed; live local GRIB2 fixture test is required instead
+23 passed, 2 skipped in 2.47s
+--- 3. Native NumPy roundtrip suite ---
+......                                                                   [100%]
+6 passed in 0.95s
+--- 4. Native xarray Dask chunked read & reduction ---
+.                                                                        [100%]
+1 passed in 1.10s
+--- 5. NetCDF4 & Zarr local fixture tests ---
+..                                                                       [100%]
+2 passed in 1.16s
+--- 6. GRIB2 local fixture test ---
+.                                                                        [100%]
+1 passed in 1.56s
+=== PYTHON SUITE FINISHED 2026-11-01T22:38:57+01:00 ===

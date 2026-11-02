@@ -1,0 +1,37 @@
+=== CPU-ONLY WHEEL BUILD AND INSTALL START 2026-11-01T22:37:57+01:00 ===
+--- 1. Building CPU-only wheel ---
+Processing ./python
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: wx1
+  Building wheel for wx1 (pyproject.toml): started
+  Building wheel for wx1 (pyproject.toml): finished with status 'done'
+  Created wheel for wx1: filename=wx1-0.1.0-cp312-cp312-linux_x86_64.whl size=770759 sha256=bf68a283463fa8ca059285c6f5dc3c01400fb2d940175a0b1f914bfce99876b1
+  Stored in directory: /tmp/pip-ephem-wheel-cache-h_ebk0yy/wheels/7c/5f/ad/67abd8ece15a0f8db8f5494fec52c76fc27b92e6cbca12ceac
+Successfully built wx1
+total 756
+drwxr-xr-x 2 j_ord j_ord     60 Nov  1 22:38 .
+drwxrwxrwt 8 root  root     180 Nov  1 22:38 ..
+-rw-r--r-- 1 j_ord j_ord 770759 Nov  1 22:38 wx1-0.1.0-cp312-cp312-linux_x86_64.whl
+--- 2. Creating clean venv without any dependencies ---
+--- 3. Installing wheel into clean venv ---
+Processing /tmp/wx1-wheelhouse/wx1-0.1.0-cp312-cp312-linux_x86_64.whl
+Installing collected packages: wx1
+Successfully installed wx1-0.1.0
+
+[notice] A new release of pip is available: 25.0.1 -> 26.2.2
+[notice] To update, run: python -m pip install --upgrade pip
+--- 4. Testing import in clean venv ---
+WX-1 imported from: /tmp/wx1-cpu-only/lib/python3.12/site-packages/wx1/__init__.py
+WX-1 version: unknown
+CONFIRMED: torch is NOT imported.
+CONFIRMED: cupy is NOT imported.
+CONFIRMED: jax is NOT imported.
+CONFIRMED: numpy is NOT imported.
+CONFIRMED: xarray is NOT imported.
+CONFIRMED: dask is NOT imported.
+=== CPU-ONLY WHEEL BUILD AND INSTALL FINISHED 2026-11-01T22:38:13+01:00 ===

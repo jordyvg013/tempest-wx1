@@ -1,0 +1,50 @@
+=== BENCH HARNESS MAKE TESTS START 2026-11-01T22:57:39+01:00 ===
+--- 1. make bench-data ---
+python bench/datasets/synthetic.py
+Synthetic fixture written to: /tmp/wx1-cross-format-fixtures
+--- 2. sha256 check on generated fixture ---
+latitude.raw: OK
+longitude.raw: OK
+temperature.raw: OK
+--- 3. make bench-test ---
+PYTHONPATH=python:. python -m pytest -q bench/tests
+....                                                                     [100%]
+=============================== warnings summary ===============================
+bench/tests/test_adapters.py::test_zarr3_adapter_roundtrip_is_bit_exact
+  /home/j_ord/miniconda3/envs/Tempest/lib/python3.12/site-packages/zarr/api/asynchronous.py:260: ZarrUserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+4 passed, 1 warning in 2.04s
+--- 4. make bench-run ---
+PYTHONPATH=python:. python -m bench.smoke_runner
+/home/j_ord/miniconda3/envs/Tempest/lib/python3.12/site-packages/zarr/api/asynchronous.py:260: ZarrUserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+=== WX-1 Phase 2 Step 1 Smoke Runner (20261101T215744Z) ===
+Fixture: regular lat/lon 31x16 F32 (496 elements)
+[PASSED] WX-1            | write:  20.877 ms | open:  0.592 ms | read:  1.504 ms | bytes:    9676 | max_err: 0.000000
+[PASSED] NetCDF4         | write:  48.172 ms | open:  7.114 ms | read:  0.226 ms | bytes:   10364 | max_err: 0.000000
+[PASSED] Zarr 3          | write: 149.615 ms | open: 11.757 ms | read:  6.540 ms | bytes:    7082 | max_err: 0.000000
+[PASSED] GRIB2/ecCodes   | write:  97.123 ms | open: 250.690 ms | read:  1.029 ms | bytes:    1171 | max_err: 0.000000
+
+Report written to: bench/results/report.md
+Data saved to: bench/results/smoke_run_20261101T215744Z.csv
+--- 5. make bench-report ---
+# WX-1 Phase 2 Step 1 Smoke Benchmark Report
+
+- **Run timestamp:** `20261101T215744Z`
+- **Dataset:** `wx1-phase2-synthetic-31x16` (F32 regular lat/lon, 496 points)
+- **Fixtures directory:** `/tmp/wx1-cross-format-fixtures`
+
+| Format | Klasse | Status | Write (ms) | Open (ms) | Read (ms) | Grootte (bytes) | Max Abs Fout |
+|---|---|---|---:|---:|---:|---:|---:|
+| **WX-1** | lossless | `passed` | 20.877 | 0.592 | 1.504 | 9676 | 0.000000 |
+| **NetCDF4** | lossless | `passed` | 48.172 | 7.114 | 0.226 | 10364 | 0.000000 |
+| **Zarr 3** | lossless | `passed` | 149.615 | 11.757 | 6.54 | 7082 | 0.000000 |
+| **GRIB2/ecCodes** | bounded_error | `passed` | 97.123 | 250.69 | 1.029 | 1171 | 0.000000 |
+
+### Conclusie:
+- Alle vier adapters (WX-1, NetCDF4, Zarr 3, GRIB2) zijn geslaagd voor de functionaliteits- en roundtriptests.
+- WX-1, NetCDF4 en Zarr 3 zijn bit-exact (fout = 0.000000).
+- GRIB2/ecCodes valt binnen de vereiste foutgrens (< 0.001 K).
+=== BENCH HARNESS MAKE TESTS FINISHED 2026-11-01T22:57:45+01:00 ===

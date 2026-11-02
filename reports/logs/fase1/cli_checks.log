@@ -1,0 +1,184 @@
+=== CLI CHECKS START 2026-11-01T22:37:47+01:00 ===
+CLI binary: /home/j_ord/WX-1-TESTS/target/debug/wx1-cli
+--- 1. CLI Help ---
+WX-1 standalone tools (experimental)
+
+Usage:
+  wx1 --help
+  wx1 create-demo <file> <dataset-id>
+  wx1 inspect <file>
+  wx1 create-chunk-demo <file> <dataset-id>
+  wx1 create-compressed-demo <file> <dataset-id>
+  wx1 create-committed-demo <file> <dataset-id>
+  wx1 create-generation-demo <file> <dataset-id>
+  wx1 create-scientific-demo <file> <dataset-id>
+  wx1 validate-scientific <file>
+  wx1 read-array-slice <file> <variable-path> <start-csv> <count-csv> <output.raw>
+  wx1 append-generation <file> <chunk-id> <payload-text>
+  wx1 append-indexed-demo <file> <chunk-id> <payload-text> <variable-id> <time-index> <level-index> <spatial-tile>
+  wx1 inspect-indexes <file>
+  wx1 index-query <file> <kind> <64-hex-byte-key>
+  wx1 inspect-chunks <file>
+  wx1 repair <file>
+  wx1 inspect-legacy-prefix <file>
+
+create-generation-demo writes generation 1 with persistent chunk-ID, variable, time, vertical and spatial B+tree indexes. append-indexed-demo appends one chunk and explicit scientific ordinal mappings using copy-on-write B+tree updates. index-query performs an exact lookup with a 32-byte key encoded as 64 hexadecimal characters. inspect and inspect-chunks validate the complete generation and its indexes before printing. v0.3.8 (minor 4), v0.3.9 (minor 5) and v0.4.x (minor 6) generation files are supported. v0.4.x uses header minor 6 and metadata schema v2 for scientific arrays; inspect prints the scientific model summary. create-scientific-demo writes a synthetic 4x4 temperature dataset through the bounded reader-based codec pipeline. validate-scientific validates all scientific chunks; read-array-slice writes a bounded row-major raw payload without converting datatype or byte order. Scientific-model files are immutable at the metadata-manifest level and cannot be appended. repair explicitly truncates only bytes after the newest fully valid generation. Only one writer per file is supported; serialize append/repair externally.
+
+--- 2. create-demo & inspect ---
+Created experimental WX-1 metadata container: demo.wx1
+Dataset ID: dataset-demo-1
+WX-1 experimental container
+Dataset ID: dataset-demo-1
+Attributes: 2
+  created_by: wx1-cli
+  profile: experimental-metadata-only
+Metadata-only container validated; use inspect-chunks for containers with chunk payloads.
+--- 3. create-chunk-demo & inspect-chunks ---
+Created experimental WX-1 chunk container: chunk_demo.wx1
+Dataset ID: dataset-chunk-1
+Chunks: 2
+WX-1 chunk container
+Dataset ID: dataset-chunk-1
+Chunks: 2
+  id=1 codec=Raw offset=105 stored=28 raw=28 crc32c=5822ba90 blake3=not-present (directory v1) verified_bytes=28
+  id=2 codec=Raw offset=133 stored=21 raw=21 crc32c=80c04599 blake3=not-present (directory v1) verified_bytes=21
+Legacy directory validated; stored-byte CRC32C and decoded lengths verified. Optional v1 WX1C footer is checked when present.
+--- 4. create-compressed-demo & inspect-chunks ---
+Created experimental WX-1 compressed chunk container: compressed.wx1
+Dataset ID: dataset-comp-1
+Chunks: 3 (Zstandard, LZ4, raw)
+WX-1 chunk container
+Dataset ID: dataset-comp-1
+Chunks: 3
+  id=1 codec=Zstandard offset=110 stored=26 raw=262144 crc32c=4d4f9572 blake3=not-present (directory v1) verified_bytes=262144
+  id=2 codec=Lz4 offset=136 stored=775 raw=131072 crc32c=1c969ade blake3=not-present (directory v1) verified_bytes=131072
+  id=3 codec=Raw offset=911 stored=28 raw=28 crc32c=1692e8a5 blake3=not-present (directory v1) verified_bytes=28
+Legacy directory validated; stored-byte CRC32C and decoded lengths verified. Optional v1 WX1C footer is checked when present.
+--- 5. create-committed-demo & inspect-chunks ---
+Created experimental WX-1 container with BLAKE3 commit footer: committed.wx1
+Dataset ID: dataset-commit-1
+Chunks: 1
+WX-1 chunk container
+Dataset ID: dataset-commit-1
+Chunks: 1
+  id=1 codec=Zstandard offset=113 stored=26 raw=262144 crc32c=29331be2 blake3=not-present (directory v1) verified_bytes=262144
+Legacy directory validated; stored-byte CRC32C and decoded lengths verified. Optional v1 WX1C footer is checked when present.
+--- 6. create-generation-demo & inspect-indexes ---
+Created durable WX-1 generation container: gen.wx1
+Dataset ID: dataset-gen-1
+Generation: 1
+Chunks: 2
+WX-1 persistent indexes
+Generation: 1
+  index=chunk-id entries=2 level=0 root=33064 required=true
+  index=variable entries=2 level=0 root=37160 required=false
+  index=time entries=2 level=0 root=41256 required=false
+  index=vertical entries=2 level=0 root=45352 required=false
+  index=spatial entries=2 level=0 root=49448 required=false
+WX-1 append-only generation container
+Dataset ID: dataset-gen-1
+Attributes: 2
+  created_by: wx1-cli
+  profile: directory-v2-append-only-generations
+Generation: 1
+Directory offset: 32904
+Visible chunks: 2
+  index=chunk-id entries=2 level=0 root=33064 required=true
+  index=variable entries=2 level=0 root=37160 required=false
+  index=time entries=2 level=0 root=41256 required=false
+  index=vertical entries=2 level=0 root=45352 required=false
+  index=spatial entries=2 level=0 root=49448 required=false
+All visible stored-byte CRC32C, BLAKE3 digests and decoded lengths validated.
+--- 7. append-generation & inspect (generieke generatie) ---
+Committed WX-1 generation 2: gen.wx1
+Appended chunk: 999 (18 stored bytes)
+WX-1 append-only generation container
+Dataset ID: dataset-gen-1
+Attributes: 2
+  created_by: wx1-cli
+  profile: directory-v2-append-only-generations
+Generation: 2
+Directory offset: 57738
+Visible chunks: 3
+  index=chunk-id entries=3 level=0 root=57826 required=true
+  index=variable entries=2 level=0 root=37160 required=false
+  index=time entries=2 level=0 root=41256 required=false
+  index=vertical entries=2 level=0 root=45352 required=false
+  index=spatial entries=2 level=0 root=49448 required=false
+All visible stored-byte CRC32C, BLAKE3 digests and decoded lengths validated.
+--- 8. create-scientific-demo & validate-scientific ---
+Created scientific WX-1 dataset: sci.wx1
+Dataset ID: dataset-sci-1
+Variable: /temperature (F32, shape 4x4, chunks 2x2)
+Coordinates: /latitude, /longitude (EPSG:4326)
+Chunks: 6 (Zstandard, raw and LZ4 block)
+Generation: 1; header minor: 6
+WX-1 scientific dataset validated
+Dataset ID: dataset-sci-1
+Generation: 1
+Variables: 3
+Chunks verified: 6
+Metadata, chunk map, stored-byte CRC32C/BLAKE3 and decoded lengths are valid.
+WX-1 append-only generation container
+Dataset ID: dataset-sci-1
+Attributes: 2
+  created_by: wx1-cli
+  profile: scientific-schema-v2-streaming
+Scientific model schema: 1
+Groups: 0
+Dimensions: 2
+  x: 4 (Longitude)
+  y: 4 (Latitude)
+Variables: 3
+  /latitude: F64 [y], chunks=1
+  /longitude: F64 [x], chunks=1
+  /temperature: F32 [y,x], chunks=4
+Coordinates: 2
+Grid mappings: 1
+Provenance records: 1
+Generation: 1
+Directory offset: 795
+Visible chunks: 6
+  index=chunk-id entries=6 level=0 root=1243 required=true
+All visible stored-byte CRC32C, BLAKE3 digests and decoded lengths validated.
+--- 9. read-array-slice ---
+Array slice written: slice_2x2.raw
+Variable: /temperature
+Datatype: F32; byte order: LittleEndian
+Shape: [2,2]
+Bytes: 16 (raw array payload; no file header)
+-rw-r--r-- 1 j_ord j_ord 16 Nov  1 22:37 slice_2x2.raw
+0000000       285.00000       286.00000       289.00000       290.00000
+0000020
+--- 10. append-guard regressie (scientific weigert append) ---
+wx1: cannot append WX-1 generation: cannot append to a scientific schema-v2 file because its metadata preamble is immutable; rewrite to a new file
+SUCCESS: append-generation correctly refused on scientific dataset (exit code 1).
+--- 11. Overwrite guard (create-scientific-demo weigert overschrijven) ---
+wx1: destination already exists; remove it before creating a new scientific demo
+SUCCESS: create-scientific-demo refused overwrite of existing file (exit code 1).
+--- 12. Trailing garbage repair regressie op generatiebestand ---
+Running repair on trailing-corrupt file:
+WX-1 repair complete: retained generation 2
+Original length: 66136 bytes
+Retained length: 66098 bytes
+Discarded tail: 38 bytes
+WX-1 append-only generation container
+Dataset ID: dataset-gen-1
+Attributes: 2
+  created_by: wx1-cli
+  profile: directory-v2-append-only-generations
+Generation: 2
+Directory offset: 57738
+Visible chunks: 3
+  index=chunk-id entries=3 level=0 root=57826 required=true
+  index=variable entries=2 level=0 root=37160 required=false
+  index=time entries=2 level=0 root=41256 required=false
+  index=vertical entries=2 level=0 root=45352 required=false
+  index=spatial entries=2 level=0 root=49448 required=false
+All visible stored-byte CRC32C, BLAKE3 digests and decoded lengths validated.
+--- 13. Stored-byte corruptie detectie op scientific dataset ---
+Validating corrupted scientific dataset (must fail checksum):
+wx1: invalid WX-1 generation container: CRC32C mismatch for WX-1 chunk 1
+SUCCESS: validate-scientific detected corrupt byte (exit code 1).
+--- 14. Cleanup temporary test directory ---
+=== CLI CHECKS FINISHED 2026-11-01T22:37:47+01:00 ===

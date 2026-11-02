@@ -1,0 +1,22 @@
+# Step-1 offline fixture. Generated files are external to the source tree.
+version: 1
+datasets:
+  - id: wx1-phase2-synthetic-31x16
+    kind: synthetic_regular_latitude_longitude
+    shape: [31, 16]
+    dimensions: [latitude, longitude]
+    dtype: '<f4'
+    variable: temperature
+    units: K
+    coordinate_variables: [latitude, longitude]
+    fixture_directory_default: /tmp/wx1-cross-format-fixtures
+    generation_command: make bench-data
+    sha256_manifest: SHA256SUMS.txt
+    comparison:
+      lossless_formats: [WX-1, NetCDF4, Zarr3]
+      bounded_error_format: GRIB2/ecCodes
+      grib2_max_abs_error_k: 0.001
+    offline: true
+    notes: >-
+      Deterministic 0.125 K-spaced F32 values. Smoke fixture only; not an ECMWF,
+      ERA5 or HARMONIE performance dataset.

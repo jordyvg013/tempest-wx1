@@ -1,0 +1,5 @@
+timestamp,format_id,label,comparison_class,status,write_ms,open_ms,read_ms,artifact_bytes,max_abs_error,error_note
+20261101T215744Z,wx1,WX-1,lossless,passed,20.877,0.592,1.504,9676,0.0,
+20261101T215744Z,netcdf4,NetCDF4,lossless,passed,48.172,7.114,0.226,10364,0.0,
+20261101T215744Z,zarr3,Zarr 3,lossless,passed,149.615,11.757,6.54,7082,0.0,
+20261101T215744Z,grib2,GRIB2/ecCodes,bounded_error,passed,97.123,250.69,1.029,1171,0.0,

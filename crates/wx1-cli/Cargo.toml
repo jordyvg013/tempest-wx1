@@ -1,0 +1,12 @@
+[package]
+name = "wx1-cli"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+wx1-format = { path = "../wx1-format" }
+
+[lints]
+workspace = true

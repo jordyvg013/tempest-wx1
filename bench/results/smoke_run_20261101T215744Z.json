@@ -1,0 +1,54 @@
+[
+  {
+    "timestamp": "20261101T215744Z",
+    "format_id": "wx1",
+    "label": "WX-1",
+    "comparison_class": "lossless",
+    "status": "passed",
+    "write_ms": 20.877,
+    "open_ms": 0.592,
+    "read_ms": 1.504,
+    "artifact_bytes": 9676,
+    "max_abs_error": 0.0,
+    "error_note": ""
+  },
+  {
+    "timestamp": "20261101T215744Z",
+    "format_id": "netcdf4",
+    "label": "NetCDF4",
+    "comparison_class": "lossless",
+    "status": "passed",
+    "write_ms": 48.172,
+    "open_ms": 7.114,
+    "read_ms": 0.226,
+    "artifact_bytes": 10364,
+    "max_abs_error": 0.0,
+    "error_note": ""
+  },
+  {
+    "timestamp": "20261101T215744Z",
+    "format_id": "zarr3",
+    "label": "Zarr 3",
+    "comparison_class": "lossless",
+    "status": "passed",
+    "write_ms": 149.615,
+    "open_ms": 11.757,
+    "read_ms": 6.54,
+    "artifact_bytes": 7082,
+    "max_abs_error": 0.0,
+    "error_note": ""
+  },
+  {
+    "timestamp": "20261101T215744Z",
+    "format_id": "grib2",
+    "label": "GRIB2/ecCodes",
+    "comparison_class": "bounded_error",
+    "status": "passed",
+    "write_ms": 97.123,
+    "open_ms": 250.69,
+    "read_ms": 1.029,
+    "artifact_bytes": 1171,
+    "max_abs_error": 0.0,
+    "error_note": ""
+  }
+]

@@ -1,0 +1,18 @@
+[package]
+name = "wx1-format"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+zstd = { version = "0.13", default-features = false }
+lz4_flex = { version = "0.11", default-features = false, features = ["std"] }
+blake3 = "1"
+
+[[bench]]
+name = "wx1_performance"
+harness = false

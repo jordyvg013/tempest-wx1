@@ -1,0 +1,197 @@
+{
+  "benchmark": "ADR 0026 Rigorous Cubed-Sphere W5 Stall & R9 Cross-Format Benchmark",
+  "scratch_root": "/mnt/d/Weer/Uitvoer/data/wx1_bench_scratch",
+  "r9_cross_format_c192_l60": {
+    "data_source": "Real ECMWF 0.1 NH PL Patches + Continuous NWP Turbulence (6x60x198x198)",
+    "c_resolution": 192,
+    "n_levels": 60,
+    "halo_width": 3,
+    "shape": [
+      6,
+      60,
+      198,
+      198
+    ],
+    "chunk_shape": [
+      1,
+      15,
+      198,
+      198
+    ],
+    "raw_bytes": 56453760,
+    "repeats": 7,
+    "formats": {
+      "WX1_ZSTD_SHUFFLE": {
+        "size_bytes": 30537709,
+        "pct_of_raw": 54.09,
+        "write_ms": 449.76,
+        "r1_open_med_ms": 7.999,
+        "r1_open_p95_ms": 9.27,
+        "r9_1tile_interior_med_ms": 39.66,
+        "r9_1tile_interior_p95_ms": 50.027,
+        "r9_1tile_with_halos_med_ms": 39.747,
+        "r9_1tile_with_halos_p95_ms": 48.768,
+        "r9_all_6tiles_med_ms": 272.128,
+        "r9_all_6tiles_p95_ms": 327.127
+      },
+      "ZARR3_BLOSC_SHUFFLE": {
+        "size_bytes": 30568878,
+        "pct_of_raw": 54.15,
+        "write_ms": 434.01,
+        "r1_open_med_ms": 17.234,
+        "r1_open_p95_ms": 18.127,
+        "r9_1tile_interior_med_ms": 27.162,
+        "r9_1tile_interior_p95_ms": 30.347,
+        "r9_1tile_with_halos_med_ms": 28.408,
+        "r9_1tile_with_halos_p95_ms": 32.852,
+        "r9_all_6tiles_med_ms": 111.742,
+        "r9_all_6tiles_p95_ms": 114.174
+      },
+      "NETCDF4_ZLIB4_SHUFFLE": {
+        "size_bytes": 30377852,
+        "pct_of_raw": 53.81,
+        "write_ms": 1221.5,
+        "r1_open_med_ms": 57.149,
+        "r1_open_p95_ms": 63.661,
+        "r9_1tile_interior_med_ms": 58.11,
+        "r9_1tile_interior_p95_ms": 66.985,
+        "r9_1tile_with_halos_med_ms": 52.099,
+        "r9_1tile_with_halos_p95_ms": 55.254,
+        "r9_all_6tiles_med_ms": 284.841,
+        "r9_all_6tiles_p95_ms": 329.756
+      }
+    }
+  },
+  "w5_append_stall_c192_l60": {
+    "data_source": "Real ECMWF 0.1 NH PL Patches + Continuous NWP Turbulence (6x60x198x198)",
+    "c_resolution": 192,
+    "n_levels": 60,
+    "halo_width": 3,
+    "step_shape": [
+      6,
+      60,
+      198,
+      198
+    ],
+    "step_raw_bytes": 56453760,
+    "modes": {
+      "buffered": {
+        "durability": "buffered",
+        "n_steps": 6,
+        "stub_model_step_ms": 500.0,
+        "per_step_io_stall_ms": [
+          49.18,
+          53.44,
+          47.36,
+          63.79,
+          49.12,
+          44.7
+        ],
+        "median_io_stall_ms": 49.15,
+        "p95_io_stall_ms": 61.2,
+        "median_io_stall_pct_of_step": 9.83,
+        "p95_io_stall_pct_of_step": 12.24,
+        "queue_backpressure_stall_ms": 0.0,
+        "total_loop_wall_ms": 3719.6,
+        "effective_throughput_gb_s": 0.091,
+        "committed_file_bytes": 183896266,
+        "telemetry": {
+          "submitted_generations": 6,
+          "committed_generations": 6,
+          "total_raw_bytes": 338722560,
+          "total_staged_bytes": 183159786,
+          "backpressure_events": 0,
+          "total_enqueue_stall_ns": 0,
+          "max_enqueue_stall_ns": 0,
+          "total_stage_duration_ns": 208479964,
+          "total_commit_duration_ns": 1504965811
+        }
+      },
+      "durable": {
+        "durability": "durable",
+        "n_steps": 6,
+        "stub_model_step_ms": 500.0,
+        "per_step_io_stall_ms": [
+          43.32,
+          50.68,
+          73.19,
+          46.25,
+          46.53,
+          66.64
+        ],
+        "median_io_stall_ms": 48.6,
+        "p95_io_stall_ms": 71.55,
+        "median_io_stall_pct_of_step": 9.72,
+        "p95_io_stall_pct_of_step": 14.31,
+        "queue_backpressure_stall_ms": 0.0,
+        "total_loop_wall_ms": 3747.04,
+        "effective_throughput_gb_s": 0.09,
+        "committed_file_bytes": 183896265,
+        "telemetry": {
+          "submitted_generations": 6,
+          "committed_generations": 6,
+          "total_raw_bytes": 338722560,
+          "total_staged_bytes": 183159786,
+          "backpressure_events": 0,
+          "total_enqueue_stall_ns": 0,
+          "max_enqueue_stall_ns": 0,
+          "total_stage_duration_ns": 236825643,
+          "total_commit_duration_ns": 1765786346
+        }
+      }
+    }
+  },
+  "noisy_scaling_c96_c192_c384": [
+    {
+      "c_resolution": 96,
+      "n_levels": 60,
+      "cells_per_level_6n2": 55296,
+      "allocated_shape": [
+        6,
+        60,
+        102,
+        102
+      ],
+      "raw_bytes": 14981760,
+      "compressed_bytes": 8137299,
+      "pct_of_raw": 54.31,
+      "write_8w_buffered_ms": 156.44,
+      "write_throughput_mb_s": 95.76,
+      "r9_1tile_interior_ms": 10.017
+    },
+    {
+      "c_resolution": 192,
+      "n_levels": 60,
+      "cells_per_level_6n2": 221184,
+      "allocated_shape": [
+        6,
+        60,
+        198,
+        198
+      ],
+      "raw_bytes": 56453760,
+      "compressed_bytes": 30537708,
+      "pct_of_raw": 54.09,
+      "write_8w_buffered_ms": 418.7,
+      "write_throughput_mb_s": 134.83,
+      "r9_1tile_interior_ms": 48.291
+    },
+    {
+      "c_resolution": 384,
+      "n_levels": 20,
+      "cells_per_level_6n2": 884736,
+      "allocated_shape": [
+        6,
+        20,
+        390,
+        390
+      ],
+      "raw_bytes": 73008000,
+      "compressed_bytes": 39407539,
+      "pct_of_raw": 53.98,
+      "write_8w_buffered_ms": 454.24,
+      "write_throughput_mb_s": 160.72,
+      "r9_1tile_interior_ms": 54.55
+    }
+  ]
+}

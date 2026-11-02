@@ -1,0 +1,425 @@
+{
+  "git_commit": "v0.4.0-tree-a1edd5ded9",
+  "integer_packing_vs_grib2": [
+    {
+      "dataset": "ecmwf_nh_sfc_2t",
+      "codec": "WX1_INTPACK_1D_ZSTD7",
+      "size_bytes": 883412,
+      "bits_per_val": 2.179,
+      "compression_ratio": 14.69,
+      "grib2_ccsds_bits_per_val": 1.939,
+      "relative_to_grib2_pct": 12.4,
+      "max_err": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "dataset": "ecmwf_nh_sfc_2t",
+      "codec": "WX1_INTPACK_1D_ZSTD19",
+      "size_bytes": 785222,
+      "bits_per_val": 1.937,
+      "compression_ratio": 16.52,
+      "grib2_ccsds_bits_per_val": 1.939,
+      "relative_to_grib2_pct": -0.1,
+      "max_err": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "dataset": "ecmwf_nh_sfc_2t",
+      "codec": "WX1_INTPACK_2D_PLANE_ZSTD7",
+      "size_bytes": 903391,
+      "bits_per_val": 2.228,
+      "compression_ratio": 14.36,
+      "grib2_ccsds_bits_per_val": 1.939,
+      "relative_to_grib2_pct": 14.9,
+      "max_err": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "dataset": "ecmwf_nh_sfc_2t",
+      "codec": "WX1_INTPACK_2D_PLANE_ZSTD19",
+      "size_bytes": 783225,
+      "bits_per_val": 1.932,
+      "compression_ratio": 16.57,
+      "grib2_ccsds_bits_per_val": 1.939,
+      "relative_to_grib2_pct": -0.3,
+      "max_err": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "dataset": "ecmwf_nh_pl_t14",
+      "codec": "WX1_INTPACK_1D_ZSTD7",
+      "size_bytes": 8884597,
+      "bits_per_val": 1.565,
+      "compression_ratio": 20.44,
+      "grib2_ccsds_bits_per_val": 1.761,
+      "relative_to_grib2_pct": -11.1,
+      "max_err": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "dataset": "ecmwf_nh_pl_t14",
+      "codec": "WX1_INTPACK_1D_ZSTD19",
+      "size_bytes": 7281332,
+      "bits_per_val": 1.283,
+      "compression_ratio": 24.95,
+      "grib2_ccsds_bits_per_val": 1.761,
+      "relative_to_grib2_pct": -27.1,
+      "max_err": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "dataset": "ecmwf_nh_pl_t14",
+      "codec": "WX1_INTPACK_2D_PLANE_ZSTD7",
+      "size_bytes": 8919447,
+      "bits_per_val": 1.571,
+      "compression_ratio": 20.36,
+      "grib2_ccsds_bits_per_val": 1.761,
+      "relative_to_grib2_pct": -10.7,
+      "max_err": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "dataset": "ecmwf_nh_pl_t14",
+      "codec": "WX1_INTPACK_2D_PLANE_ZSTD19",
+      "size_bytes": 7356669,
+      "bits_per_val": 1.296,
+      "compression_ratio": 24.69,
+      "grib2_ccsds_bits_per_val": 1.761,
+      "relative_to_grib2_pct": -26.4,
+      "max_err": 0.0,
+      "rmse": 0.0
+    }
+  ],
+  "unquantized_lossy_compression": [
+    {
+      "dataset": "jax_turbulent_nwp_field",
+      "description": "Atmospheric Kolmogorov Turbulence (JAX continuous float32)",
+      "transform": "lossless_raw_zstd7",
+      "declared_bound": null,
+      "metric": "none",
+      "compressed_bytes": 3333415,
+      "bits_per_val": 25.43,
+      "compression_ratio": 1.26,
+      "max_abs_error": 0.0,
+      "rmse": 0.0,
+      "bound_complies": true
+    },
+    {
+      "dataset": "jax_turbulent_nwp_field",
+      "description": "Atmospheric Kolmogorov Turbulence (JAX continuous float32)",
+      "transform": "lossy_absolute_eps_0.5",
+      "declared_bound": 0.5,
+      "metric": "absolute",
+      "compressed_bytes": 779903,
+      "bits_per_val": 5.95,
+      "compression_ratio": 5.38,
+      "max_abs_error": 0.5,
+      "rmse": 0.288797,
+      "bound_complies": true
+    },
+    {
+      "dataset": "jax_turbulent_nwp_field",
+      "description": "Atmospheric Kolmogorov Turbulence (JAX continuous float32)",
+      "transform": "lossy_absolute_eps_0.1",
+      "declared_bound": 0.1,
+      "metric": "absolute",
+      "compressed_bytes": 1161402,
+      "bits_per_val": 8.86,
+      "compression_ratio": 3.61,
+      "max_abs_error": 0.0625,
+      "rmse": 0.036109,
+      "bound_complies": true
+    },
+    {
+      "dataset": "jax_turbulent_nwp_field",
+      "description": "Atmospheric Kolmogorov Turbulence (JAX continuous float32)",
+      "transform": "lossy_absolute_eps_0.01",
+      "declared_bound": 0.01,
+      "metric": "absolute",
+      "compressed_bytes": 1524151,
+      "bits_per_val": 11.63,
+      "compression_ratio": 2.75,
+      "max_abs_error": 0.007812,
+      "rmse": 0.004508,
+      "bound_complies": true
+    },
+    {
+      "dataset": "jax_turbulent_nwp_field",
+      "description": "Atmospheric Kolmogorov Turbulence (JAX continuous float32)",
+      "transform": "lossy_relative_eps_0.01",
+      "declared_bound": 0.01,
+      "metric": "relative",
+      "compressed_bytes": 480849,
+      "bits_per_val": 3.67,
+      "compression_ratio": 8.72,
+      "max_abs_error": 2.0,
+      "max_rel_error": 0.007752,
+      "rmse": 1.073558,
+      "bound_complies": true
+    },
+    {
+      "dataset": "jax_turbulent_nwp_field",
+      "description": "Atmospheric Kolmogorov Turbulence (JAX continuous float32)",
+      "transform": "lossy_relative_eps_0.001",
+      "declared_bound": 0.001,
+      "metric": "relative",
+      "compressed_bytes": 913785,
+      "bits_per_val": 6.97,
+      "compression_ratio": 4.59,
+      "max_abs_error": 0.25,
+      "max_rel_error": 0.000976,
+      "rmse": 0.133999,
+      "bound_complies": true
+    },
+    {
+      "dataset": "jax_turbulent_nwp_field",
+      "description": "Atmospheric Kolmogorov Turbulence (JAX continuous float32)",
+      "transform": "lossy_relative_eps_0.0001",
+      "declared_bound": 0.0001,
+      "metric": "relative",
+      "compressed_bytes": 1393182,
+      "bits_per_val": 10.63,
+      "compression_ratio": 3.01,
+      "max_abs_error": 0.015625,
+      "max_rel_error": 6.1e-05,
+      "rmse": 0.008375,
+      "bound_complies": true
+    },
+    {
+      "dataset": "jax_turbulent_nwp_field",
+      "description": "Atmospheric Kolmogorov Turbulence (JAX continuous float32)",
+      "transform": "intpack_plane2d_step_0.25",
+      "declared_bound": 0.125,
+      "metric": "absolute",
+      "compressed_bytes": 967205,
+      "bits_per_val": 7.379,
+      "compression_ratio": 4.34,
+      "max_abs_error": 0.125,
+      "rmse": 0.072216,
+      "bound_complies": true
+    },
+    {
+      "dataset": "jax_turbulent_nwp_field",
+      "description": "Atmospheric Kolmogorov Turbulence (JAX continuous float32)",
+      "transform": "intpack_plane2d_step_0.1",
+      "declared_bound": 0.05,
+      "metric": "absolute",
+      "compressed_bytes": 1201575,
+      "bits_per_val": 9.167,
+      "compression_ratio": 3.49,
+      "max_abs_error": 0.050003,
+      "rmse": 0.02886,
+      "bound_complies": true
+    },
+    {
+      "dataset": "eumetsat_mtg_fci_olr",
+      "description": "EUMETSAT MTG-I1 FCI L2 OLR Radiative Flux (NetCDF float32)",
+      "transform": "lossless_raw_zstd7",
+      "declared_bound": null,
+      "metric": "none",
+      "compressed_bytes": 1997436,
+      "bits_per_val": 15.24,
+      "compression_ratio": 2.1,
+      "max_abs_error": 0.0,
+      "rmse": 0.0,
+      "bound_complies": true
+    },
+    {
+      "dataset": "eumetsat_mtg_fci_olr",
+      "description": "EUMETSAT MTG-I1 FCI L2 OLR Radiative Flux (NetCDF float32)",
+      "transform": "lossy_absolute_eps_0.5",
+      "declared_bound": 0.5,
+      "metric": "absolute",
+      "compressed_bytes": 449693,
+      "bits_per_val": 3.43,
+      "compression_ratio": 9.33,
+      "max_abs_error": 0.5,
+      "rmse": 0.288323,
+      "bound_complies": true
+    },
+    {
+      "dataset": "eumetsat_mtg_fci_olr",
+      "description": "EUMETSAT MTG-I1 FCI L2 OLR Radiative Flux (NetCDF float32)",
+      "transform": "lossy_absolute_eps_0.1",
+      "declared_bound": 0.1,
+      "metric": "absolute",
+      "compressed_bytes": 818783,
+      "bits_per_val": 6.25,
+      "compression_ratio": 5.12,
+      "max_abs_error": 0.060013,
+      "rmse": 0.036077,
+      "bound_complies": true
+    },
+    {
+      "dataset": "eumetsat_mtg_fci_olr",
+      "description": "EUMETSAT MTG-I1 FCI L2 OLR Radiative Flux (NetCDF float32)",
+      "transform": "lossy_absolute_eps_0.01",
+      "declared_bound": 0.01,
+      "metric": "absolute",
+      "compressed_bytes": 1205326,
+      "bits_per_val": 9.2,
+      "compression_ratio": 3.48,
+      "max_abs_error": 0.007507,
+      "rmse": 0.00451,
+      "bound_complies": true
+    },
+    {
+      "dataset": "eumetsat_mtg_fci_olr",
+      "description": "EUMETSAT MTG-I1 FCI L2 OLR Radiative Flux (NetCDF float32)",
+      "transform": "lossy_relative_eps_0.01",
+      "declared_bound": 0.01,
+      "metric": "relative",
+      "compressed_bytes": 213230,
+      "bits_per_val": 1.63,
+      "compression_ratio": 19.67,
+      "max_abs_error": 2.0,
+      "max_rel_error": 0.007752,
+      "rmse": 1.128482,
+      "bound_complies": true
+    },
+    {
+      "dataset": "eumetsat_mtg_fci_olr",
+      "description": "EUMETSAT MTG-I1 FCI L2 OLR Radiative Flux (NetCDF float32)",
+      "transform": "lossy_relative_eps_0.001",
+      "declared_bound": 0.001,
+      "metric": "relative",
+      "compressed_bytes": 578427,
+      "bits_per_val": 4.41,
+      "compression_ratio": 7.25,
+      "max_abs_error": 0.25,
+      "max_rel_error": 0.000976,
+      "rmse": 0.141734,
+      "bound_complies": true
+    },
+    {
+      "dataset": "eumetsat_mtg_fci_olr",
+      "description": "EUMETSAT MTG-I1 FCI L2 OLR Radiative Flux (NetCDF float32)",
+      "transform": "lossy_relative_eps_0.0001",
+      "declared_bound": 0.0001,
+      "metric": "relative",
+      "compressed_bytes": 1077897,
+      "bits_per_val": 8.22,
+      "compression_ratio": 3.89,
+      "max_abs_error": 0.015015,
+      "max_rel_error": 5.9e-05,
+      "rmse": 0.008837,
+      "bound_complies": true
+    },
+    {
+      "dataset": "eumetsat_mtg_fci_olr",
+      "description": "EUMETSAT MTG-I1 FCI L2 OLR Radiative Flux (NetCDF float32)",
+      "transform": "intpack_plane2d_step_0.25",
+      "declared_bound": 0.125,
+      "metric": "absolute",
+      "compressed_bytes": 551907,
+      "bits_per_val": 4.211,
+      "compression_ratio": 7.6,
+      "max_abs_error": 0.120026,
+      "rmse": 0.072153,
+      "bound_complies": true
+    },
+    {
+      "dataset": "eumetsat_mtg_fci_olr",
+      "description": "EUMETSAT MTG-I1 FCI L2 OLR Radiative Flux (NetCDF float32)",
+      "transform": "intpack_plane2d_step_0.1",
+      "declared_bound": 0.05,
+      "metric": "absolute",
+      "compressed_bytes": 710265,
+      "bits_per_val": 5.419,
+      "compression_ratio": 5.91,
+      "max_abs_error": 0.050018,
+      "rmse": 0.029166,
+      "bound_complies": true
+    }
+  ],
+  "r2_cold_warm_benchmark": [
+    {
+      "filesystem": "ext4",
+      "dataset": "ecmwf_nh_sfc_2t",
+      "shape": [
+        901,
+        3600
+      ],
+      "chunk_shape": [
+        256,
+        256
+      ],
+      "cache_state": "warm",
+      "write_durability": "buffered",
+      "git_commit": "v0.4.0-tree-a1edd5ded9",
+      "reps": 30,
+      "r2_mean_ms": 11.231,
+      "r2_med_ms": 10.976,
+      "r2_p95_ms": 12.645,
+      "r2_min_ms": 10.007,
+      "r2_max_ms": 16.016,
+      "r2_std_ms": 1.105
+    },
+    {
+      "filesystem": "ext4",
+      "dataset": "ecmwf_nh_sfc_2t",
+      "shape": [
+        901,
+        3600
+      ],
+      "chunk_shape": [
+        256,
+        256
+      ],
+      "cache_state": "cold",
+      "write_durability": "buffered",
+      "git_commit": "v0.4.0-tree-a1edd5ded9",
+      "reps": 30,
+      "r2_mean_ms": 10.373,
+      "r2_med_ms": 10.458,
+      "r2_p95_ms": 11.402,
+      "r2_min_ms": 9.092,
+      "r2_max_ms": 11.529,
+      "r2_std_ms": 0.693
+    },
+    {
+      "filesystem": "/mnt/d",
+      "dataset": "ecmwf_nh_sfc_2t",
+      "shape": [
+        901,
+        3600
+      ],
+      "chunk_shape": [
+        256,
+        256
+      ],
+      "cache_state": "warm",
+      "write_durability": "buffered",
+      "git_commit": "v0.4.0-tree-a1edd5ded9",
+      "reps": 30,
+      "r2_mean_ms": 27.811,
+      "r2_med_ms": 28.008,
+      "r2_p95_ms": 33.009,
+      "r2_min_ms": 21.588,
+      "r2_max_ms": 36.252,
+      "r2_std_ms": 3.413
+    },
+    {
+      "filesystem": "/mnt/d",
+      "dataset": "ecmwf_nh_sfc_2t",
+      "shape": [
+        901,
+        3600
+      ],
+      "chunk_shape": [
+        256,
+        256
+      ],
+      "cache_state": "cold",
+      "write_durability": "buffered",
+      "git_commit": "v0.4.0-tree-a1edd5ded9",
+      "reps": 30,
+      "r2_mean_ms": 31.856,
+      "r2_med_ms": 30.941,
+      "r2_p95_ms": 40.752,
+      "r2_min_ms": 24.48,
+      "r2_max_ms": 52.596,
+      "r2_std_ms": 6.217
+    }
+  ]
+}

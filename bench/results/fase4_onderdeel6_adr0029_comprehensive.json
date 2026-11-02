@@ -1,0 +1,337 @@
+{
+  "revision": "v0.4.3-standalone-sha256-0016483942",
+  "datasets_meta": {
+    "variable_name": "olr_value",
+    "storage_dtype": "uint16",
+    "unpacked_dtype": "float32",
+    "scale_factor": 0.009999999776482582,
+    "add_offset": 0.0,
+    "_FillValue": 65535,
+    "unit": "W/m^2",
+    "long_name": "Outgoing Long Wave Radiation",
+    "full_disk_shape": [
+      5568,
+      5568
+    ],
+    "full_disk_total_pixels": 31002624,
+    "full_disk_fill_pixels": 10606713,
+    "full_disk_fill_pct": 34.21,
+    "full_disk_valid_pct": 65.79,
+    "crop_earth_disc_shape": [
+      1024,
+      1024
+    ],
+    "crop_earth_disc_range": [
+      126.50999450683594,
+      336.8999938964844
+    ],
+    "crop_limb_shape": [
+      512,
+      512
+    ],
+    "crop_limb_nans": 72643,
+    "crop_limb_nan_pct": 27.71
+  },
+  "cross_format_lossy": [
+    {
+      "dataset": "synthetic_kolmogorov",
+      "epsilon": 0.1,
+      "wx1_dyadic_bpv": 8.529,
+      "wx1_dyadic_max_err": 0.0625,
+      "wx1_dyadic_step": 0.125,
+      "wx1_nondyadic_bpv": 7.441,
+      "wx1_nondyadic_max_err": 0.100006,
+      "wx1_nondyadic_step": 0.2,
+      "netcdf4_bitgroom_bpv": 9.9,
+      "netcdf4_bitgroom_max_err": 0.12497,
+      "netcdf4_granularbr_bpv": 6.21,
+      "netcdf4_granularbr_max_err": 0.5,
+      "zarr3_bitround_bpv": 5.14,
+      "zarr3_bitround_max_err": 2.0
+    },
+    {
+      "dataset": "synthetic_kolmogorov",
+      "epsilon": 0.01,
+      "wx1_dyadic_bpv": 11.52,
+      "wx1_dyadic_max_err": 0.007812,
+      "wx1_dyadic_step": 0.015625,
+      "wx1_nondyadic_bpv": 11.183,
+      "wx1_nondyadic_max_err": 0.01001,
+      "wx1_nondyadic_step": 0.02,
+      "netcdf4_bitgroom_bpv": 12.94,
+      "netcdf4_bitgroom_max_err": 0.00778,
+      "netcdf4_granularbr_bpv": 10.22,
+      "netcdf4_granularbr_max_err": 0.03125,
+      "zarr3_bitround_bpv": 6.34,
+      "zarr3_bitround_max_err": 1.0
+    },
+    {
+      "dataset": "jax_barotropic_vorticity_model",
+      "epsilon": 0.1,
+      "wx1_dyadic_bpv": 5.379,
+      "wx1_dyadic_max_err": 0.062499,
+      "wx1_dyadic_step": 0.125,
+      "wx1_nondyadic_bpv": 4.827,
+      "wx1_nondyadic_max_err": 0.099999,
+      "wx1_nondyadic_step": 0.2,
+      "netcdf4_bitgroom_bpv": 16.6,
+      "netcdf4_bitgroom_max_err": 0.00098,
+      "netcdf4_granularbr_bpv": 13.85,
+      "netcdf4_granularbr_max_err": 0.00391,
+      "zarr3_bitround_bpv": 12.43,
+      "zarr3_bitround_max_err": 0.01561
+    },
+    {
+      "dataset": "jax_barotropic_vorticity_model",
+      "epsilon": 0.01,
+      "wx1_dyadic_bpv": 8.658,
+      "wx1_dyadic_max_err": 0.007813,
+      "wx1_dyadic_step": 0.015625,
+      "wx1_nondyadic_bpv": 7.998,
+      "wx1_nondyadic_max_err": 0.01,
+      "wx1_nondyadic_step": 0.02,
+      "netcdf4_bitgroom_bpv": 19.53,
+      "netcdf4_bitgroom_max_err": 6e-05,
+      "netcdf4_granularbr_bpv": 17.36,
+      "netcdf4_granularbr_max_err": 0.00049,
+      "zarr3_bitround_bpv": 13.33,
+      "zarr3_bitround_max_err": 0.00781
+    },
+    {
+      "dataset": "eumetsat_mtg_fci_olr",
+      "epsilon": 0.1,
+      "wx1_dyadic_bpv": 5.217,
+      "wx1_dyadic_max_err": 0.060028,
+      "wx1_dyadic_step": 0.125,
+      "wx1_nondyadic_bpv": 4.586,
+      "wx1_nondyadic_max_err": 0.100006,
+      "wx1_nondyadic_step": 0.2,
+      "netcdf4_bitgroom_bpv": 6.95,
+      "netcdf4_bitgroom_max_err": 0.12497,
+      "netcdf4_granularbr_bpv": 3.48,
+      "netcdf4_granularbr_max_err": 0.5,
+      "zarr3_bitround_bpv": 2.17,
+      "zarr3_bitround_max_err": 2.0
+    },
+    {
+      "dataset": "eumetsat_mtg_fci_olr",
+      "epsilon": 0.01,
+      "wx1_dyadic_bpv": 8.404,
+      "wx1_dyadic_max_err": 0.007507,
+      "wx1_dyadic_step": 0.015625,
+      "wx1_nondyadic_bpv": 8.052,
+      "wx1_nondyadic_max_err": 0.01001,
+      "wx1_nondyadic_step": 0.02,
+      "netcdf4_bitgroom_bpv": 10.03,
+      "netcdf4_bitgroom_max_err": 0.00778,
+      "netcdf4_granularbr_bpv": 7.49,
+      "netcdf4_granularbr_max_err": 0.03,
+      "zarr3_bitround_bpv": 2.94,
+      "zarr3_bitround_max_err": 1.0
+    }
+  ],
+  "integer_packing": [
+    {
+      "dataset": "ecmwf_nh_sfc_2t",
+      "predictor": "1d",
+      "zstd_level": 3,
+      "size_bytes": 946509,
+      "bits_per_val": 2.334,
+      "comp_mb_s": 205.3,
+      "decomp_mb_s": 156.1,
+      "grib2_ccsds_bpv": 1.939,
+      "ratio": 13.71
+    },
+    {
+      "dataset": "ecmwf_nh_sfc_2t",
+      "predictor": "1d",
+      "zstd_level": 7,
+      "size_bytes": 883412,
+      "bits_per_val": 2.179,
+      "comp_mb_s": 99.3,
+      "decomp_mb_s": 166.5,
+      "grib2_ccsds_bpv": 1.939,
+      "ratio": 14.69
+    },
+    {
+      "dataset": "ecmwf_nh_sfc_2t",
+      "predictor": "1d",
+      "zstd_level": 19,
+      "size_bytes": 785222,
+      "bits_per_val": 1.937,
+      "comp_mb_s": 6.8,
+      "decomp_mb_s": 143.4,
+      "grib2_ccsds_bpv": 1.939,
+      "ratio": 16.52
+    },
+    {
+      "dataset": "ecmwf_nh_sfc_2t",
+      "predictor": "2d_plane",
+      "zstd_level": 3,
+      "size_bytes": 953538,
+      "bits_per_val": 2.352,
+      "comp_mb_s": 184.4,
+      "decomp_mb_s": 8.2,
+      "grib2_ccsds_bpv": 1.939,
+      "ratio": 13.61
+    },
+    {
+      "dataset": "ecmwf_nh_sfc_2t",
+      "predictor": "2d_plane",
+      "zstd_level": 7,
+      "size_bytes": 903391,
+      "bits_per_val": 2.228,
+      "comp_mb_s": 111.4,
+      "decomp_mb_s": 8.1,
+      "grib2_ccsds_bpv": 1.939,
+      "ratio": 14.36
+    },
+    {
+      "dataset": "ecmwf_nh_sfc_2t",
+      "predictor": "2d_plane",
+      "zstd_level": 19,
+      "size_bytes": 783225,
+      "bits_per_val": 1.932,
+      "comp_mb_s": 6.7,
+      "decomp_mb_s": 8.2,
+      "grib2_ccsds_bpv": 1.939,
+      "ratio": 16.57
+    },
+    {
+      "dataset": "ecmwf_nh_pl_t14",
+      "predictor": "1d",
+      "zstd_level": 3,
+      "size_bytes": 9842370,
+      "bits_per_val": 1.734,
+      "comp_mb_s": 199.5,
+      "decomp_mb_s": 169.8,
+      "grib2_ccsds_bpv": 1.761,
+      "ratio": 18.46
+    },
+    {
+      "dataset": "ecmwf_nh_pl_t14",
+      "predictor": "1d",
+      "zstd_level": 7,
+      "size_bytes": 8884597,
+      "bits_per_val": 1.565,
+      "comp_mb_s": 116.4,
+      "decomp_mb_s": 172.0,
+      "grib2_ccsds_bpv": 1.761,
+      "ratio": 20.44
+    },
+    {
+      "dataset": "ecmwf_nh_pl_t14",
+      "predictor": "1d",
+      "zstd_level": 19,
+      "size_bytes": 7281332,
+      "bits_per_val": 1.283,
+      "comp_mb_s": 6.9,
+      "decomp_mb_s": 154.1,
+      "grib2_ccsds_bpv": 1.761,
+      "ratio": 24.95
+    },
+    {
+      "dataset": "ecmwf_nh_pl_t14",
+      "predictor": "2d_plane",
+      "zstd_level": 3,
+      "size_bytes": 9711996,
+      "bits_per_val": 1.711,
+      "comp_mb_s": 174.3,
+      "decomp_mb_s": 8.2,
+      "grib2_ccsds_bpv": 1.761,
+      "ratio": 18.7
+    },
+    {
+      "dataset": "ecmwf_nh_pl_t14",
+      "predictor": "2d_plane",
+      "zstd_level": 7,
+      "size_bytes": 8919447,
+      "bits_per_val": 1.571,
+      "comp_mb_s": 105.7,
+      "decomp_mb_s": 8.2,
+      "grib2_ccsds_bpv": 1.761,
+      "ratio": 20.36
+    },
+    {
+      "dataset": "ecmwf_nh_pl_t14",
+      "predictor": "2d_plane",
+      "zstd_level": 19,
+      "size_bytes": 7356669,
+      "bits_per_val": 1.296,
+      "comp_mb_s": 6.4,
+      "decomp_mb_s": 8.1,
+      "grib2_ccsds_bpv": 1.761,
+      "ratio": 24.69
+    }
+  ],
+  "ablation_r2": [
+    {
+      "dataset": "ecmwf_nh_sfc_2t",
+      "baseline_optimized_ms": 21.97,
+      "no_descriptor_cache_ms": 27.25,
+      "descriptor_overhead_ms": 5.28,
+      "serial_rayon_ms": 31.3,
+      "parallel_speedup": 1.42,
+      "copy_overhead_ms": 7.47,
+      "crc32c_overhead_ms": 0.066
+    },
+    {
+      "dataset": "ecmwf_nh_pl_t14",
+      "baseline_optimized_ms": 428.42,
+      "no_descriptor_cache_ms": 496.89,
+      "descriptor_overhead_ms": 68.47,
+      "serial_rayon_ms": 527.18,
+      "parallel_speedup": 1.23,
+      "copy_overhead_ms": 9.24,
+      "crc32c_overhead_ms": 0.713
+    },
+    {
+      "dataset": "knmi_harm46_nl",
+      "baseline_optimized_ms": 32.89,
+      "no_descriptor_cache_ms": 31.8,
+      "descriptor_overhead_ms": -1.09,
+      "serial_rayon_ms": 33.62,
+      "parallel_speedup": 1.02,
+      "copy_overhead_ms": 0.2,
+      "crc32c_overhead_ms": 0.157
+    }
+  ],
+  "read_paths_r1_r9": [
+    {
+      "path": "R1_open_container",
+      "time_ms": 2.759,
+      "cold_ms": 8.274,
+      "description": "Open container and parse superblock+footer"
+    },
+    {
+      "path": "R2_full_2d_field",
+      "time_ms": 25.1,
+      "description": "Read 901x3600 float32 2D surface field"
+    },
+    {
+      "path": "R3_single_level_slice",
+      "time_ms": 21.31,
+      "description": "Read 1 level out of 14 vertical levels (901x3600)"
+    },
+    {
+      "path": "R4_point_vertical_profile",
+      "time_ms": 4.89,
+      "description": "Extract 14 levels profile at single station location"
+    },
+    {
+      "path": "R5_regional_bounding_box",
+      "time_ms": 1.01,
+      "description": "Read 100x100 bounding box (local forecast domain)"
+    },
+    {
+      "path": "R7_ensemble_single_member",
+      "time_ms": 2.22,
+      "description": "Read 1 ensemble member out of 50 members"
+    },
+    {
+      "path": "R8_1000_stations_scatter",
+      "time_ms": 19.27,
+      "description": "Batch point read of 1000 discrete station coordinates across grid"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+schema_version: 1
+baseline_id: wx1-v0.4.3-planner-4096-user-wsl
+status: user-confirmed-provisional-baseline
+source:
+  benchmark: crates/wx1-format/benches/wx1_performance.rs
+  execution: user-provided WSL2 terminal output dated 2026-11-01
+  filesystem_location: /tmp
+  build_profile: cargo-bench-optimized
+planner:
+  unit: ns_per_plan
+  median_ns: 6228.0
+  equivalent_median_us: 6.228
+  chunk_references: 4096
+  selected_chunks: 81
+  black_box_present: true
+  note: >-
+    The benchmark output reported plan_median_ns=6228. The confirmed baseline
+    is 6228.0 ns per plan, equal to 6.228 us (approximately 6.2 us). Do not
+    write 6.228 ns; that would be a different value. Future reports use a
+    decimal point and never use thousands separators.
+scale_targets:
+  - chunk_references: 65536
+    status: not_measured
+  - chunk_references: 1048576
+    status: not_measured
+reporting:
+  decimal_separator: "."
+  thousands_separator: none
+  examples:
+    - "6228.0 ns"
+    - "6.228 us"
+    - "4096 chunks"

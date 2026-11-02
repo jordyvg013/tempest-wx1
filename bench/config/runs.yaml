@@ -1,0 +1,16 @@
+version: 1
+phase: 2
+step: 1
+mode: adapter_roundtrip_smoke
+formal_benchmark: false
+performance_comparison: false
+acceptance_thresholds_evaluated: false
+fixture_repetitions: 1
+formal_runs_minimum: 5
+read_repetitions_cold_minimum: 30
+read_repetitions_warm_minimum: 30
+warmup_runs_discarded: true
+randomize_format_order_for_formal_runs: true
+numeric_reporting:
+  decimal_separator: '.'
+  thousands_separator: none

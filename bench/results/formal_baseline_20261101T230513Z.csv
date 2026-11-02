@@ -1,0 +1,9 @@
+dataset,format,size_bytes,r1_open_median_ms,r1_open_p95_ms,r2_read_median_ms,r2_read_p95_ms,r5_region_median_ms,r5_region_p95_ms,max_abs_error,rmse,bias,bit_exact
+harmonie_nl,zarr3,252694,5.862,7.481,7.729,10.274,9.408,11.028,0.0,0.0,0.0,True
+harmonie_nl,netcdf4,619712,2.407,3.25,0.297,0.456,0.332,0.52,0.0,0.0,0.0,True
+harmonie_nl,grib2,305107,3.805,4.531,2.451,3.146,2.369,2.923,0.0,0.0,0.0,True
+harmonie_nl,wx1,268710,0.183,0.394,1.863,2.302,0.466,0.596,0.0,0.0,0.0,True
+ecmwf_oper_europe,zarr3,102993,6.121,7.819,8.175,10.56,8.972,13.318,0.0,0.0,0.0,True
+ecmwf_oper_europe,netcdf4,701964,2.487,3.343,0.315,0.584,0.348,0.489,0.0,0.0,0.0,True
+ecmwf_oper_europe,grib2,75269,4.114,5.77,3.978,4.801,3.887,4.797,0.0,0.0,0.0,True
+ecmwf_oper_europe,wx1,104890,0.207,0.25,1.632,2.278,0.269,0.316,0.0,0.0,0.0,True

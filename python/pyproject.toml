@@ -1,0 +1,41 @@
+[build-system]
+requires = ["maturin>=1.9,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "wx1"
+version = "0.1.0"
+description = "Python interface for the experimental WX-1 scientific storage format"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "WX-1 contributors" }]
+dependencies = []
+
+[project.optional-dependencies]
+test = ["numpy>=1.26", "xarray>=2024.1", "scipy>=1.11", "pytest>=8.0"]
+numpy = ["numpy>=1.26"]
+xarray = ["numpy>=1.26", "xarray>=2024.1"]
+dask = ["numpy>=1.26", "xarray>=2024.1", "dask[array]>=2024.1"]
+netcdf = ["numpy>=1.26", "xarray>=2024.1", "netCDF4>=1.6"]
+zarr = ["numpy>=1.26", "xarray>=2024.1", "zarr>=2.17"]
+grib2 = ["numpy>=1.26", "xarray>=2024.1", "cfgrib>=0.9.15", "eccodes>=2.38"]
+all = [
+  "numpy>=1.26",
+  "xarray>=2024.1",
+  "dask[array]>=2024.1",
+  "netCDF4>=1.6",
+  "zarr>=2.17",
+  "cfgrib>=0.9.15",
+  "eccodes>=2.38",
+]
+
+[project.entry-points."xarray.backends"]
+wx1 = "wx1.xarray_backend:Wx1BackendEntrypoint"
+
+[tool.maturin]
+manifest-path = "../bindings/wx1-python/Cargo.toml"
+python-source = "."
+module-name = "wx1._core"
+features = ["extension-module"]
+strip = true
