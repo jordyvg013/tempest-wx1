@@ -22,43 +22,43 @@
     "repeats": 7,
     "formats": {
       "WX1_ZSTD_SHUFFLE": {
-        "size_bytes": 30537709,
+        "size_bytes": 30537745,
         "pct_of_raw": 54.09,
-        "write_ms": 449.76,
-        "r1_open_med_ms": 7.999,
-        "r1_open_p95_ms": 9.27,
-        "r9_1tile_interior_med_ms": 39.66,
-        "r9_1tile_interior_p95_ms": 50.027,
-        "r9_1tile_with_halos_med_ms": 39.747,
-        "r9_1tile_with_halos_p95_ms": 48.768,
-        "r9_all_6tiles_med_ms": 272.128,
-        "r9_all_6tiles_p95_ms": 327.127
+        "write_ms": 414.3,
+        "r1_open_med_ms": 8.646,
+        "r1_open_p95_ms": 9.233,
+        "r9_1tile_interior_med_ms": 42.415,
+        "r9_1tile_interior_p95_ms": 48.8,
+        "r9_1tile_with_halos_med_ms": 42.87,
+        "r9_1tile_with_halos_p95_ms": 47.47,
+        "r9_all_6tiles_med_ms": 297.072,
+        "r9_all_6tiles_p95_ms": 314.005
       },
       "ZARR3_BLOSC_SHUFFLE": {
         "size_bytes": 30568878,
         "pct_of_raw": 54.15,
-        "write_ms": 434.01,
-        "r1_open_med_ms": 17.234,
-        "r1_open_p95_ms": 18.127,
-        "r9_1tile_interior_med_ms": 27.162,
-        "r9_1tile_interior_p95_ms": 30.347,
-        "r9_1tile_with_halos_med_ms": 28.408,
-        "r9_1tile_with_halos_p95_ms": 32.852,
-        "r9_all_6tiles_med_ms": 111.742,
-        "r9_all_6tiles_p95_ms": 114.174
+        "write_ms": 352.07,
+        "r1_open_med_ms": 22.782,
+        "r1_open_p95_ms": 24.743,
+        "r9_1tile_interior_med_ms": 33.463,
+        "r9_1tile_interior_p95_ms": 35.088,
+        "r9_1tile_with_halos_med_ms": 28.991,
+        "r9_1tile_with_halos_p95_ms": 41.629,
+        "r9_all_6tiles_med_ms": 130.645,
+        "r9_all_6tiles_p95_ms": 138.54
       },
       "NETCDF4_ZLIB4_SHUFFLE": {
         "size_bytes": 30377852,
         "pct_of_raw": 53.81,
-        "write_ms": 1221.5,
-        "r1_open_med_ms": 57.149,
-        "r1_open_p95_ms": 63.661,
-        "r9_1tile_interior_med_ms": 58.11,
-        "r9_1tile_interior_p95_ms": 66.985,
-        "r9_1tile_with_halos_med_ms": 52.099,
-        "r9_1tile_with_halos_p95_ms": 55.254,
-        "r9_all_6tiles_med_ms": 284.841,
-        "r9_all_6tiles_p95_ms": 329.756
+        "write_ms": 1223.97,
+        "r1_open_med_ms": 54.777,
+        "r1_open_p95_ms": 59.983,
+        "r9_1tile_interior_med_ms": 48.851,
+        "r9_1tile_interior_p95_ms": 57.036,
+        "r9_1tile_with_halos_med_ms": 50.365,
+        "r9_1tile_with_halos_p95_ms": 61.337,
+        "r9_all_6tiles_med_ms": 269.632,
+        "r9_all_6tiles_p95_ms": 307.237
       }
     }
   },
@@ -80,19 +80,19 @@
         "n_steps": 6,
         "stub_model_step_ms": 500.0,
         "per_step_io_stall_ms": [
-          49.18,
-          53.44,
-          47.36,
-          63.79,
-          49.12,
-          44.7
+          70.27,
+          67.66,
+          50.83,
+          56.67,
+          52.66,
+          56.57
         ],
-        "median_io_stall_ms": 49.15,
-        "p95_io_stall_ms": 61.2,
-        "median_io_stall_pct_of_step": 9.83,
-        "p95_io_stall_pct_of_step": 12.24,
+        "median_io_stall_ms": 56.62,
+        "p95_io_stall_ms": 69.62,
+        "median_io_stall_pct_of_step": 11.32,
+        "p95_io_stall_pct_of_step": 13.92,
         "queue_backpressure_stall_ms": 0.0,
-        "total_loop_wall_ms": 3719.6,
+        "total_loop_wall_ms": 3715.4,
         "effective_throughput_gb_s": 0.091,
         "committed_file_bytes": 183896266,
         "telemetry": {
@@ -103,8 +103,8 @@
           "backpressure_events": 0,
           "total_enqueue_stall_ns": 0,
           "max_enqueue_stall_ns": 0,
-          "total_stage_duration_ns": 208479964,
-          "total_commit_duration_ns": 1504965811
+          "total_stage_duration_ns": 215183797,
+          "total_commit_duration_ns": 1671951232
         }
       },
       "durable": {
@@ -112,20 +112,20 @@
         "n_steps": 6,
         "stub_model_step_ms": 500.0,
         "per_step_io_stall_ms": [
-          43.32,
-          50.68,
-          73.19,
-          46.25,
-          46.53,
-          66.64
+          55.5,
+          46.81,
+          42.32,
+          54.4,
+          52.0,
+          42.23
         ],
-        "median_io_stall_ms": 48.6,
-        "p95_io_stall_ms": 71.55,
-        "median_io_stall_pct_of_step": 9.72,
-        "p95_io_stall_pct_of_step": 14.31,
+        "median_io_stall_ms": 49.41,
+        "p95_io_stall_ms": 55.22,
+        "median_io_stall_pct_of_step": 9.88,
+        "p95_io_stall_pct_of_step": 11.04,
         "queue_backpressure_stall_ms": 0.0,
-        "total_loop_wall_ms": 3747.04,
-        "effective_throughput_gb_s": 0.09,
+        "total_loop_wall_ms": 3704.34,
+        "effective_throughput_gb_s": 0.091,
         "committed_file_bytes": 183896265,
         "telemetry": {
           "submitted_generations": 6,
@@ -135,8 +135,8 @@
           "backpressure_events": 0,
           "total_enqueue_stall_ns": 0,
           "max_enqueue_stall_ns": 0,
-          "total_stage_duration_ns": 236825643,
-          "total_commit_duration_ns": 1765786346
+          "total_stage_duration_ns": 213818589,
+          "total_commit_duration_ns": 1827301583
         }
       }
     }
@@ -153,11 +153,11 @@
         102
       ],
       "raw_bytes": 14981760,
-      "compressed_bytes": 8137299,
+      "compressed_bytes": 8137335,
       "pct_of_raw": 54.31,
-      "write_8w_buffered_ms": 156.44,
-      "write_throughput_mb_s": 95.76,
-      "r9_1tile_interior_ms": 10.017
+      "write_8w_buffered_ms": 125.84,
+      "write_throughput_mb_s": 119.06,
+      "r9_1tile_interior_ms": 9.355
     },
     {
       "c_resolution": 192,
@@ -170,11 +170,11 @@
         198
       ],
       "raw_bytes": 56453760,
-      "compressed_bytes": 30537708,
+      "compressed_bytes": 30537744,
       "pct_of_raw": 54.09,
-      "write_8w_buffered_ms": 418.7,
-      "write_throughput_mb_s": 134.83,
-      "r9_1tile_interior_ms": 48.291
+      "write_8w_buffered_ms": 375.38,
+      "write_throughput_mb_s": 150.39,
+      "r9_1tile_interior_ms": 38.968
     },
     {
       "c_resolution": 384,
@@ -187,11 +187,11 @@
         390
       ],
       "raw_bytes": 73008000,
-      "compressed_bytes": 39407539,
+      "compressed_bytes": 39407575,
       "pct_of_raw": 53.98,
-      "write_8w_buffered_ms": 454.24,
-      "write_throughput_mb_s": 160.72,
-      "r9_1tile_interior_ms": 54.55
+      "write_8w_buffered_ms": 471.74,
+      "write_throughput_mb_s": 154.76,
+      "r9_1tile_interior_ms": 48.125
     }
   ]
 }

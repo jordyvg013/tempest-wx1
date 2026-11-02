@@ -1,6 +1,6 @@
 # WX-1 Fase 4, Onderdeel 6: ADR 0029 — Benchmark Report [Windows D: Drive via WSL2 9P/DrvFs (/mnt/d)]
-**Workspace Reconstructie-ID**: `v0.4.3-standalone-sha256-0016483942`  
-**Benchmarkdatum**: 2026-11-02 18:23:00 CET  
+**Workspace Reconstructie-ID**: `v0.4.3-standalone-sha256-20597edf8d`  
+**Benchmarkdatum**: 2026-11-02 20:14:37 CET  
 **Filesysteem**: **Windows D: Drive via WSL2 9P/DrvFs (/mnt/d)**  
 **Hardware / OS**: Intel Core i5-12500H (16 vCPU) | Linux WSL2 kernel 6.18.54 | Python 3.12 (Conda ECMWF) | Rust 1.99.1  
 
@@ -10,7 +10,7 @@ Bij de uitvoering van `pytest python/tests` slaagden **alle geactiveerde tests**
 2. `test_grib2_adapter_when_not_installed`: overgeslagen omdat `cfgrib`/`eccodes` wel degelijk is geïnstalleerd.
 3. `test_grib2_local_fixture_when_path_is_supplied`: in de vorige run zonder `WX1_GRIB2_FIXTURE` omgevingsvariabele was dit de **3e geskipte test** (`pytest.skip('Set WX1_GRIB2_FIXTURE...')`); nu voorzien van een automatische fallback naar de lokale grib2-fixture zodat deze altijd draait en slaagt.
 
-De repository bevindt zich in een standalone distributie zonder `.git`-database; de canonieke versie is deterministisch berekend via de SHA-256 hash van `Cargo.lock` en manifesten: **`v0.4.3-standalone-sha256-0016483942`**.
+De repository bevindt zich in een standalone distributie zonder `.git`-database; de canonieke versie is deterministisch berekend via de SHA-256 hash van `Cargo.lock` en manifesten: **`v0.4.3-standalone-sha256-20597edf8d`**.
 
 ## 1. Datasets & EUMETSAT MTG-I1 FCI L2 Metadata (Punt 1 & 2)
 - **`synthetic_kolmogorov`**: $1024 \times 1024$ continue synthetische FFT-turbulentie ($E(k) \propto k^{-5/3}$).
@@ -42,46 +42,46 @@ Gemeten met de `zstd 0.13`-crate (libzstd 1.5.7) en gevectoriseerde 2D prefix-su
 
 | Dataset | Voorspeller | Zstandard Niveau | Bits/Waarde | Ratio | Compressie (MB/s) | Decompressie (MB/s) | GRIB2 CCSDS b/v | Delta t.o.v. GRIB2 |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| `ecmwf_nh_sfc_2t` | `1d` | 3 | **2.325** | 13.8x | 205.2 MB/s | **147.8 MB/s** | 1.939 | **+19.9%** |
-| `ecmwf_nh_sfc_2t` | `1d` | 7 | **2.179** | 14.7x | 110.0 MB/s | **170.6 MB/s** | 1.939 | **+12.4%** |
-| `ecmwf_nh_sfc_2t` | `1d` | 19 | **1.935** | 16.5x | 6.6 MB/s | **133.3 MB/s** | 1.939 | **-0.2%** |
-| `ecmwf_nh_sfc_2t` | `2d_plane` | 3 | **2.352** | 13.6x | 145.8 MB/s | **141.4 MB/s** | 1.939 | **+21.3%** |
-| `ecmwf_nh_sfc_2t` | `2d_plane` | 7 | **2.228** | 14.4x | 91.9 MB/s | **123.3 MB/s** | 1.939 | **+14.9%** |
-| `ecmwf_nh_sfc_2t` | `2d_plane` | 19 | **1.932** | 16.6x | 6.1 MB/s | **103.1 MB/s** | 1.939 | **-0.4%** |
-| `ecmwf_nh_pl_t14` | `1d` | 3 | **1.733** | 18.5x | 200.7 MB/s | **168.7 MB/s** | 1.761 | **-1.6%** |
-| `ecmwf_nh_pl_t14` | `1d` | 7 | **1.565** | 20.4x | 109.7 MB/s | **164.7 MB/s** | 1.761 | **-11.1%** |
-| `ecmwf_nh_pl_t14` | `1d` | 19 | **1.282** | 24.9x | 6.7 MB/s | **144.7 MB/s** | 1.761 | **-27.2%** |
-| `ecmwf_nh_pl_t14` | `2d_plane` | 3 | **1.711** | 18.7x | 163.2 MB/s | **126.7 MB/s** | 1.761 | **-2.8%** |
-| `ecmwf_nh_pl_t14` | `2d_plane` | 7 | **1.572** | 20.4x | 103.5 MB/s | **133.0 MB/s** | 1.761 | **-10.7%** |
-| `ecmwf_nh_pl_t14` | `2d_plane` | 19 | **1.296** | 24.7x | 6.2 MB/s | **118.1 MB/s** | 1.761 | **-26.4%** |
+| `ecmwf_nh_sfc_2t` | `1d` | 3 | **2.325** | 13.8x | 139.8 MB/s | **148.8 MB/s** | 1.939 | **+19.9%** |
+| `ecmwf_nh_sfc_2t` | `1d` | 7 | **2.179** | 14.7x | 103.5 MB/s | **174.4 MB/s** | 1.939 | **+12.4%** |
+| `ecmwf_nh_sfc_2t` | `1d` | 19 | **1.935** | 16.5x | 5.7 MB/s | **114.8 MB/s** | 1.939 | **-0.2%** |
+| `ecmwf_nh_sfc_2t` | `2d_plane` | 3 | **2.352** | 13.6x | 137.4 MB/s | **122.6 MB/s** | 1.939 | **+21.3%** |
+| `ecmwf_nh_sfc_2t` | `2d_plane` | 7 | **2.228** | 14.4x | 97.8 MB/s | **114.3 MB/s** | 1.939 | **+14.9%** |
+| `ecmwf_nh_sfc_2t` | `2d_plane` | 19 | **1.932** | 16.6x | 5.6 MB/s | **115.5 MB/s** | 1.939 | **-0.4%** |
+| `ecmwf_nh_pl_t14` | `1d` | 3 | **1.733** | 18.5x | 207.6 MB/s | **162.2 MB/s** | 1.761 | **-1.6%** |
+| `ecmwf_nh_pl_t14` | `1d` | 7 | **1.565** | 20.4x | 108.6 MB/s | **164.1 MB/s** | 1.761 | **-11.1%** |
+| `ecmwf_nh_pl_t14` | `1d` | 19 | **1.282** | 24.9x | 6.5 MB/s | **135.8 MB/s** | 1.761 | **-27.2%** |
+| `ecmwf_nh_pl_t14` | `2d_plane` | 3 | **1.711** | 18.7x | 164.2 MB/s | **127.9 MB/s** | 1.761 | **-2.8%** |
+| `ecmwf_nh_pl_t14` | `2d_plane` | 7 | **1.572** | 20.4x | 98.2 MB/s | **128.8 MB/s** | 1.761 | **-10.7%** |
+| `ecmwf_nh_pl_t14` | `2d_plane` | 19 | **1.296** | 24.7x | 6.2 MB/s | **109.8 MB/s** | 1.761 | **-26.4%** |
 
 ## 4. R2 Ablatiestudie op 3 Volledige Datasets (Punt 7 & 8)
 Linux-paginacache geleegd via `posix_fadvise(POSIX_FADV_DONTNEED)`. De 4 componenten van R2 (descriptorhergebruik, parallelle `std::thread::scope`-decompressie, direct memory placement `copy_intersection`, en software slice-by-8 `crc32c`) zijn uitgevoerd op /mnt/d/ (Windows NTFS gemount via 9P/DrvFs):
 
 | Dataset (Volledig) | Basis (Alle 4 Opts) | Zonder Descriptor Cache | Seriële Single-Thread (`std::thread::scope` uit) | `copy_intersection` Winst | Software Slice-by-8 `crc32c` Tijd |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| `ecmwf_nh_sfc_2t` | **36.99 ms** | 40.23 ms (+3.24 ms) | 66.89 ms (1.81x) | ~0.87 ms | ~0.331 ms |
-| `ecmwf_nh_pl_t14` | **570.49 ms** | 569.95 ms (+-0.54 ms) | 484.72 ms (0.85x) | ~134.34 ms | ~3.567 ms |
-| `knmi_harm46_nl` | **40.57 ms** | 40.26 ms (+-0.31 ms) | 37.77 ms (0.93x) | ~2.00 ms | ~0.784 ms |
+| `ecmwf_nh_sfc_2t` | **35.05 ms** | 39.02 ms (+3.97 ms) | 61.80 ms (1.76x) | ~0.92 ms | ~0.331 ms |
+| `ecmwf_nh_pl_t14` | **506.02 ms** | 520.54 ms (+14.52 ms) | 418.46 ms (0.83x) | ~57.92 ms | ~3.567 ms |
+| `knmi_harm46_nl` | **32.25 ms** | 30.58 ms (+-1.67 ms) | 32.38 ms (1.00x) | ~0.70 ms | ~0.784 ms |
 
 ## 5. ADR 0029: Prestaties van de Wetenschappelijke Leespaden (R1 t/m R9)
 Metingen uitgevoerd op **Windows D: Drive via WSL2 9P/DrvFs (/mnt/d)** met expliciete vermelding van GRIB2, NetCDF-4 en Zarr v3 ter vergelijking:
 
 | Leespad | Beschrijving | WX-1 Warm (ms) | WX-1 Linux-Cache Koud (ms) | GRIB2 (ms) | NetCDF-4 (ms) | Zarr v3 (ms) | Speedup vs GRIB2 | Status t.o.v. ≥2× Doel |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
-| **`R1_open_container`** | Open container and parse superblock+footer (1-chunk file; 1M-chunk R1 in Part 5) | **3.20** | 7.87 | 78.61 | 31.26 | 29.29 | **24.57×** | ✅ Gehaald (≥2×) |
-| **`R2_full_2d_field`** | Read 901x3600 float32 2D surface field (12.97 MB) | **29.80** | — | 37.06 | 69.38 | 200.92 | **1.24×** | ✅ Gehaald |
-| **`R3_single_level_slice`** | Read 1 level out of 14 vertical levels (901x3600) | **39.35** | — | 69.60 | 83.92 | 185.62 | **1.77×** | ✅ Gehaald |
-| **`R4_point_vertical_profile`** | Extract 14-level vertical profile at single station location | **7.68** | — | 556.51 | 56.32 | 49.51 | **72.46×** | ✅ Gehaald (≥2×) |
-| **`R5_regional_bounding_box`** | Read 100x100 regional bounding box | **1.49** | — | 47.28 | 29.54 | 8.61 | **31.72×** | ✅ Gehaald (≥2×) |
-| **`R7_ensemble_single_member`** | Read 1 ensemble member out of 50 members | **2.71** | — | 76.53 | 56.53 | 63.04 | **28.22×** | ✅ Gehaald (≥2×) |
-| **`R8_1000_stations_scatter`** | Batch point read of 1,000 discrete station coordinates across grid | **36.32** | — | 45.55 | 84.13 | 71.38 | **1.25×** | ✅ Gehaald |
+| **`R1_open_container`** | Open container and parse superblock+footer (1-chunk file; 1M-chunk R1 in Part 5) | **2.73** | 8.01 | 74.89 | 12.46 | 7.16 | **27.46×** | ✅ Gehaald (≥2×) |
+| **`R2_full_2d_field`** | Read 901x3600 float32 2D surface field (12.97 MB) | **25.22** | — | 42.06 | 87.21 | 86.65 | **1.67×** | ✅ Gehaald |
+| **`R3_single_level_slice`** | Read 1 level out of 14 vertical levels (901x3600) | **28.68** | — | 69.73 | 100.50 | 88.66 | **2.43×** | ✅ Gehaald (≥2×) |
+| **`R4_point_vertical_profile`** | Extract 14-level vertical profile at single station location | **7.10** | — | 471.97 | 64.92 | 31.74 | **66.47×** | ✅ Gehaald (≥2×) |
+| **`R5_regional_bounding_box`** | Read 100x100 regional bounding box | **1.42** | — | 38.68 | 30.15 | 6.78 | **27.20×** | ✅ Gehaald (≥2×) |
+| **`R7_ensemble_single_member`** | Read 1 ensemble member out of 50 members | **2.19** | — | 44.32 | 29.02 | 22.53 | **20.23×** | ✅ Gehaald (≥2×) |
+| **`R8_1000_stations_scatter`** | Batch point read of 1,000 discrete station coordinates across grid | **40.06** | — | 47.46 | 71.16 | 69.16 | **1.18×** | ✅ Gehaald |
 
 ## 6. Schrijfpaden (W2/W4/W5), 1M-Chunk R1 Open & Verify-Modus Zonder BLAKE3 op ext4
 ### 6.1 Schrijf-, Append- en Durable Commit-Paden op ext4
-- **`W2` (Gebufferd vs Duurzaam Schrijven, 512x512 f32)**: Gebufferd: **25.27 ms** | Duurzaam (fsync/durable): **31.09 ms** (fsync overhead: +5.82 ms).
-- **`W4`/`W5` (Async Multi-Gen Append + Durable Commit, 8 generaties)**: Caller submit mediaan: **11.66 ms** | Max queue stall: **36.258 ms** | Gem. durable commit per generatie: **30.54 ms**.
-- **`W5` (Flush / Close verificatie)**: **138.34 ms**.
+- **`W2` (Gebufferd vs Duurzaam Schrijven, 512x512 f32)**: Gebufferd: **28.56 ms** | Duurzaam (fsync/durable): **33.58 ms** (fsync overhead: +5.02 ms).
+- **`W4`/`W5` (Async Multi-Gen Append + Durable Commit, 8 generaties)**: Caller submit mediaan: **15.65 ms** | Max queue stall: **41.571 ms** | Gem. durable commit per generatie: **33.12 ms**.
+- **`W5` (Flush / Close verificatie)**: **139.50 ms**.
 
 ### 6.2 Schaalbaarheid van `R1` tot 1.048.576 (1M) Chunks (On-Disk)
 | Aantal Chunks | `validate_descriptors` (ms) | `serialize` (ms) | `R1` On-Disk Open Lazy (`from_bytes`, ms) | `R1` On-Disk Open Eager (`from_bytes_verified`, ms) | `R2` Plan-tijd (µs) |

@@ -1,5 +1,5 @@
 # WX-1 Uitgebreid 15-Formaten & Wetenschappelijke Gegevenstypen Rapport [WSL2 Native ext4]
-**Datum**: 2026-11-02 18:21:07 CET  
+**Datum**: 2026-11-02 20:15:22 CET  
 **Filesysteem**: WSL2 Native ext4 (`/dev/sdd`, `/home/j_ord/wx1_bench_ext4/multiformat_suite/`)  
 **Geteste Formaten (15 formaten / 16 extensies)**: `.wx1`, `.grib2` (`grid_ccsds`), `.nc` (NetCDF-4 `zlib+shuffle`), `.cdf` (NetCDF-3 Classic 64-bit), `.zarr` (Zarr v3), `.h5`, `.hdf5`, `.odim.h5` (`ODIM_H5/V2_4`), `.hdf` (HDF4 `pyhdf.SD`), `.bufr` (WMO FM 94 Edition 4), `.crex` (WMO FM 95 Edition 2), `.pp` (UKMO PP), `.nimrod` (UKMO NIMROD), `.dorade` (NCAR DORADE), `.iwrf` (NCAR IWRF), `.tif` (GeoTIFF)  
 
@@ -38,25 +38,25 @@ Elk formaat is fysiek aangemaakt op `/home/j_ord/wx1_bench_ext4/multiformat_suit
 
 | Formaat | Extensie | Standaard / Specificatie | Vorm & Type | Bestandsgrootte (B) | WX-1 Grootte (B) | Import $\rightarrow$ WX-1 (ms) | Export $\leftarrow$ WX-1 (ms) | Roundtrip $E_{\max}$ | Verificatie & SHA-256 |
 | :--- | :---: | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
-| **WX-1** | `.wx1` | WX-1 Container v1 (Zstd+Shuffle) | `[261, 661]` (`float32`) | 73,067 B | **73,067 B** | 8.5 ms | 1.2 ms | **0.0e+00** | Magic `WX1\x00` + BLAKE3/CRC32C verified (`e41e002e3b4967b6`) |
-| **GRIB2** | `.grib2` | WMO FM 92 GRIB Edition 2 (grid_ccsds) | `[261, 661]` (`float32`) | 75,063 B | **75,306 B** | 51.6 ms | 6.0 ms | **0.0e+00** | eccodes `packingType=grid_ccsds` verified (`99037900eec38b0d`) |
-| **NetCDF-4** | `.nc` | Unidata NetCDF-4 / HDF5 (zlib=4, shuffle=True) | `[261, 661]` (`float32`) | 81,091 B | **75,905 B** | 13.4 ms | 12.3 ms | **0.0e+00** | `ncdump -hs` (_DeflateLevel=4, _Shuffle=true) (`debe0bb4001ab06d`) |
-| **NetCDF-3** | `.cdf` | Unidata Classic NetCDF (NETCDF3_64BIT_OFFSET) | `[261, 661]` (`float32`) | 691,664 B | **75,907 B** | 10.3 ms | 9.8 ms | **0.0e+00** | Magic `CDF\x02` (NETCDF3_64BIT_OFFSET) (`ee4607819a2a5873`) |
-| **Zarr v3** | `.zarr` | Zarr v3 Specification (`zarr.json` + Blosc/Zstd) | `[261, 661]` (`float32`) | 97,554 B | **75,777 B** | 19.6 ms | 38.9 ms | **0.0e+00** | Zarr v3 `zarr.json` verified (`d788114ba4874f09`) |
-| **HDF5 (.h5)** | `.h5` | HDF5 Hierarchical Data Format v5 (gzip+shuffle) | `[261, 661]` (`float32`) | 78,496 B | **75,771 B** | 17.0 ms | 10.3 ms | **0.0e+00** | Magic `\x89HDF\r\n\x1a\n` + `h5py` verified (`6042d4bba16826e9`) |
-| **HDF5 (.hdf5)** | `.hdf5` | HDF5 3D Upper-Air Volume (14 levels, gzip+shuffle) | `[14, 261, 661]` (`float32`) | 639,835 B | **665,934 B** | 105.3 ms | 157.1 ms | **1.5e-05** | 14-level 3D HDF5 dataset verified (`4f369934099b6b95`) |
-| **ODIM_H5** | `.odim.h5` | EUMETNET OPERA Radar ODIM_H5 (ODIM_H5/V2_0) | `[360, 320]` (`uint8`) | 331,687 B | **54,094 B** | 15.8 ms | 4.5 ms | **0.0e+00** | Authentic KNMI Den Helder (RAD:NL51, 360x320 uint8) `/what`, `/where`, `DBZH` verified (`cedb0ce424040dc6`) |
-| **HDF4 (.hdf)** | `.hdf` | NCSA/NASA Classic HDF4 v4.2 Scientific Data Set (DEFLATE) | `[261, 661]` (`float32`) | 100,350 B | **75,288 B** | 14.2 ms | 11.4 ms | **0.0e+00** | Magic `\x0e\x03\x13\x01` (`pyhdf.SD`) verified (`f865d74754a1beb9`) |
-| **BUFR** | `.bufr` | WMO FM 94 BUFR Edition 4 (1 message, 1000 SYNOP station subsets) | `[1000, 6]` (`float64`) | 10,574 B | **23,632 B** | 9.4 ms | 1.5 ms | **5.7e-14** | `bufr_ls` verified (1 Edition 4 message, 1000 subsets, 5.7e-14 float64 scale precision) (`6339141fba07ecc5`) |
-| **CREX** | `.crex` | WMO FM 95 CREX Edition 2 (`++CREX++ ... 7777`) | `[1000, 6]` (`float64`) | 46,219 B | **22,966 B** | 10.0 ms | 6.0 ms | **0.0e+00** | Sections 0-4 (`++CREX++`..`7777`) verified (`c9d3739e97292207`) |
-| **PP Format** | `.pp` | UK Met Office UM Post-Processing Format (64-word big-endian Lookup) | `[261, 661]` (`float32`) | 690,356 B | **73,714 B** | 10.3 ms | 2.0 ms | **0.0e+00** | Fortran record marker `0x00000100` (256 B header) verified (`e112fe74bbf6436d`) |
-| **NIMROD** | `.nimrod` | UK Met Office NIMROD Gridded Radar Format (512-byte big-endian header) | `[360, 320]` (`uint8`) | 461,328 B | **62,891 B** | 8.0 ms | 1.3 ms | **0.0e+00** | Fortran record marker `0x00000200` (512 B header) verified (`74f424a90c3d9895`) |
-| **DORADE** | `.dorade` | NCAR DORADE Sweepfile (`SSWB`/`VOLD`/`RADD`/`PARM`/`CELV`/`SWIB`/`RYIB`/`ASIB`/`RDAT`) | `[360, 320]` (`uint8`) | 482,372 B | **62,651 B** | 9.6 ms | 2.3 ms | **0.0e+00** | 360 rays × 320 gates DORADE descriptor stream verified (`41d10af7c98ab3cf`) |
-| **IWRF** | `.iwrf` | NCAR Integrated Weather Radar Format (`0x77770001`..`0x77770003` packets) | `[360, 320]` (`uint8`) | 478,224 B | **62,719 B** | 9.9 ms | 2.8 ms | **0.0e+00** | IWRF packet stream (`RADAR_INFO`/`SCAN_SEGMENT`/`PULSE_HEADER`) verified (`79a6cececd3f5d67`) |
-| **GeoTIFF** | `.tif` | OGC GeoTIFF (Zstd + Horizontal Floating-Point Predictor) | `[261, 661]` (`float32`) | 73,429 B | **75,300 B** | 13.4 ms | 4.1 ms | **0.0e+00** | `tifffile` + GeoTIFF tags verified (`008d8f38d8c55f7e`) |
+| **WX-1** | `.wx1` | WX-1 Container v1 (Zstd+Shuffle) | `[261, 661]` (`float32`) | 73,067 B | **73,067 B** | 23.3 ms | 1.3 ms | **0.0e+00** | Magic `WX1\x00` + BLAKE3/CRC32C verified (`e41e002e3b4967b6`) |
+| **GRIB2** | `.grib2` | WMO FM 92 GRIB Edition 2 (grid_ccsds) | `[261, 661]` (`float32`) | 75,063 B | **75,306 B** | 60.1 ms | 6.0 ms | **0.0e+00** | eccodes `packingType=grid_ccsds` verified (`99037900eec38b0d`) |
+| **NetCDF-4** | `.nc` | Unidata NetCDF-4 / HDF5 (zlib=4, shuffle=True) | `[261, 661]` (`float32`) | 81,091 B | **75,905 B** | 12.5 ms | 11.9 ms | **0.0e+00** | `ncdump -hs` (_DeflateLevel=4, _Shuffle=true) (`debe0bb4001ab06d`) |
+| **NetCDF-3** | `.cdf` | Unidata Classic NetCDF (NETCDF3_64BIT_OFFSET) | `[261, 661]` (`float32`) | 691,664 B | **75,907 B** | 12.0 ms | 10.0 ms | **0.0e+00** | Magic `CDF\x02` (NETCDF3_64BIT_OFFSET) (`ee4607819a2a5873`) |
+| **Zarr v3** | `.zarr` | Zarr v3 Specification (`zarr.json` + Blosc/Zstd) | `[261, 661]` (`float32`) | 97,554 B | **75,777 B** | 15.4 ms | 39.1 ms | **0.0e+00** | Zarr v3 `zarr.json` verified (`d788114ba4874f09`) |
+| **HDF5 (.h5)** | `.h5` | HDF5 Hierarchical Data Format v5 (gzip+shuffle) | `[261, 661]` (`float32`) | 78,496 B | **75,771 B** | 19.7 ms | 13.5 ms | **0.0e+00** | Magic `\x89HDF\r\n\x1a\n` + `h5py` verified (`6042d4bba16826e9`) |
+| **HDF5 (.hdf5)** | `.hdf5` | HDF5 3D Upper-Air Volume (14 levels, gzip+shuffle) | `[14, 261, 661]` (`float32`) | 639,835 B | **665,934 B** | 111.7 ms | 144.7 ms | **1.5e-05** | 14-level 3D HDF5 dataset verified (`4f369934099b6b95`) |
+| **ODIM_H5** | `.odim.h5` | EUMETNET OPERA Radar ODIM_H5 (ODIM_H5/V2_0) | `[360, 320]` (`uint8`) | 331,687 B | **54,094 B** | 30.6 ms | 5.5 ms | **0.0e+00** | Authentic KNMI Den Helder (RAD:NL51, 360x320 uint8) `/what`, `/where`, `DBZH` verified (`cedb0ce424040dc6`) |
+| **HDF4 (.hdf)** | `.hdf` | NCSA/NASA Classic HDF4 v4.2 Scientific Data Set (DEFLATE) | `[261, 661]` (`float32`) | 100,350 B | **75,288 B** | 16.5 ms | 10.2 ms | **0.0e+00** | Magic `\x0e\x03\x13\x01` (`pyhdf.SD`) verified (`f865d74754a1beb9`) |
+| **BUFR** | `.bufr` | WMO FM 94 BUFR Edition 4 (1 message, 1000 SYNOP station subsets) | `[1000, 6]` (`float64`) | 10,574 B | **23,632 B** | 13.2 ms | 1.8 ms | **5.7e-14** | `bufr_ls` verified (1 Edition 4 message, 1000 subsets, 5.7e-14 float64 scale precision) (`6339141fba07ecc5`) |
+| **CREX** | `.crex` | WMO FM 95 CREX Edition 2 (`++CREX++ ... 7777`) | `[1000, 6]` (`float64`) | 46,219 B | **22,966 B** | 13.1 ms | 4.9 ms | **0.0e+00** | Sections 0-4 (`++CREX++`..`7777`) verified (`c9d3739e97292207`) |
+| **PP Format** | `.pp` | UK Met Office UM Post-Processing Format (64-word big-endian Lookup) | `[261, 661]` (`float32`) | 690,356 B | **73,714 B** | 13.1 ms | 2.1 ms | **0.0e+00** | Fortran record marker `0x00000100` (256 B header) verified (`e112fe74bbf6436d`) |
+| **NIMROD** | `.nimrod` | UK Met Office NIMROD Gridded Radar Format (512-byte big-endian header) | `[360, 320]` (`uint8`) | 461,328 B | **62,891 B** | 9.9 ms | 2.0 ms | **0.0e+00** | Fortran record marker `0x00000200` (512 B header) verified (`74f424a90c3d9895`) |
+| **DORADE** | `.dorade` | NCAR DORADE Sweepfile (`SSWB`/`VOLD`/`RADD`/`PARM`/`CELV`/`SWIB`/`RYIB`/`ASIB`/`RDAT`) | `[360, 320]` (`uint8`) | 482,372 B | **62,651 B** | 10.8 ms | 4.6 ms | **0.0e+00** | 360 rays × 320 gates DORADE descriptor stream verified (`41d10af7c98ab3cf`) |
+| **IWRF** | `.iwrf` | NCAR Integrated Weather Radar Format (`0x77770001`..`0x77770003` packets) | `[360, 320]` (`uint8`) | 478,224 B | **62,719 B** | 9.3 ms | 4.3 ms | **0.0e+00** | IWRF packet stream (`RADAR_INFO`/`SCAN_SEGMENT`/`PULSE_HEADER`) verified (`79a6cececd3f5d67`) |
+| **GeoTIFF** | `.tif` | OGC GeoTIFF (Zstd + Horizontal Floating-Point Predictor) | `[261, 661]` (`float32`) | 73,429 B | **75,300 B** | 13.4 ms | 4.1 ms | **0.0e+00** | `tifffile` + GeoTIFF tags verified (`32482e9846cd687e`) |
 
 ## 3. Deel 3: Multi-Format CLI Pipeline (`wx1 convert` & `wx1 info`)
-- **GRIB2 $\rightarrow$ WX-1**: 0.865 s
-- **WX-1 $\rightarrow$ NetCDF-4**: 0.362 s
-- **NetCDF-4 $\rightarrow$ Zarr**: 0.643 s
-- **WX-1 $\rightarrow$ UKMO PP (`.pp`)**: 0.295 s
+- **GRIB2 $\rightarrow$ WX-1**: 0.77 s
+- **WX-1 $\rightarrow$ NetCDF-4**: 0.404 s
+- **NetCDF-4 $\rightarrow$ Zarr**: 0.654 s
+- **WX-1 $\rightarrow$ UKMO PP (`.pp`)**: 0.268 s
