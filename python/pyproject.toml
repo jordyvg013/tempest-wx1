@@ -8,8 +8,8 @@ version = "0.1.0"
 description = "Tempest: WX-1 — High-Performance Scientific Weather Storage Format"
 readme = "README.md"
 requires-python = ">=3.9"
-license = { text = "MIT" }
-authors = [{ name = "WX-1 contributors" }]
+license = { text = "Apache-2.0" }
+authors = [{ name = "Jordy van Gils" }]
 dependencies = []
 
 [project.optional-dependencies]
