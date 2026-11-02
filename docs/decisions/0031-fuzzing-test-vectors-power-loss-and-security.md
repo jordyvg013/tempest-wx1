@@ -39,7 +39,7 @@ In operational numerical weather prediction (NWP) environments:
   11. `malicious_decompression_bomb.wx1`: Chunk with 1000x expansion ratio exceeding security threshold.
 
 ### 3. Power-Loss Resilience & Crash Consistency
-- **Atomic Two-Phase Generation Commit**:
+- **Atomic Three-Phase Generation Commit**:
   - Phase 1: Payload chunks are written sequentially to disk.
   - Phase 2: Index pages and metadata manifest are written.
   - Phase 3: The generation commit footer (containing generation sequence, timestamp, BLAKE3 manifest hash, and footer CRC32C) is flushed to persistent storage via `fsync` (`durable_commit`).
@@ -51,10 +51,11 @@ In operational numerical weather prediction (NWP) environments:
 - **Allocation Limits**:
   - Maximum chunk uncompressed size: **64 MiB** (`MAX_CHUNK_BYTES`).
   - Maximum metadata manifest size: **32 MiB** (`MAX_METADATA_BYTES`).
-  - Maximum array dimensions: **32** (`MAX_DIMENSIONS`).
-  - Maximum chunk references per generation: **1,048,576** (`MAX_CHUNK_REFS`).
-  - Maximum decompression expansion factor: **100×** ratio guard against zip/zstd bombs.
-  - CBOR parser recursion depth limit: **16 levels**.
+  - Maximum scientific array rank: **64** (`MAX_SCIENTIFIC_RANK`).
+  - Maximum total dataset dimensions: **4,096** (`MAX_SCIENTIFIC_DIMENSIONS`).
+  - Maximum chunk references per generation: **1,048,576** (`MAX_CHUNK_REFS` / `MAX_CHUNKS`).
+  - Decompression bomb guard: uncompressed chunk length capped at `MAX_CHUNK_BYTES` (64 MiB) with strict bounded streaming `.take(limit)` and pre-allocation clamp, rejecting declared sizes $> 64\text{ MiB}$ prior to decompression.
+  - CBOR parser memory & depth: Non-recursive tabular schema design with structural depth bounded to $\le 3$ levels, bounded entity counts (`MAX_SCIENTIFIC_VARIABLES`, `MAX_SCIENTIFIC_GROUPS`, etc.), preventing nested recursion attacks.
 - **Variable Path Sanitization**:
   - Variable paths must follow Unix-style canonical hierarchy: `/group/subgroup/variable`.
   - Disallow relative components (`.`, `..`), control characters, null bytes, backslashes (`\`), or empty segments (`//`).
