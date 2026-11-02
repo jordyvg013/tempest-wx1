@@ -146,6 +146,7 @@ def from_grib(
         raise FileNotFoundError(f"GRIB2 file not found: {in_file}")
 
     messages = []
+    seen_vars = set()
     with open(in_file, "rb") as f:
         while True:
             gid = eccodes.codes_grib_new_from_file(f)
@@ -155,23 +156,31 @@ def from_grib(
                 sname = eccodes.codes_get(gid, "shortName")
             except Exception:
                 sname = "unknown"
+            seen_vars.add(sname)
+            if variable_name is not None and sname != str(variable_name):
+                eccodes.codes_release(gid)
+                continue
             messages.append((gid, sname))
 
     if not messages:
+        if variable_name is not None:
+            raise KeyError(
+                f"Variable '{variable_name}' not found. Available in GRIB: {sorted(seen_vars)}"
+            )
         raise ValueError(f"No valid GRIB2 messages found in: {in_file}")
 
     try:
-        # Filter by requested variable_name or default to the first variable
         if variable_name is not None:
-            selected_messages = [m for m in messages if m[1] == str(variable_name)]
-            if not selected_messages:
-                available = sorted({m[1] for m in messages})
-                raise KeyError(
-                    f"Variable '{variable_name}' not found. Available in GRIB: {available}"
-                )
+            selected_messages = messages
         else:
             first_var = messages[0][1]
             selected_messages = [m for m in messages if m[1] == first_var]
+            for m in messages:
+                if m[1] != first_var:
+                    try:
+                        eccodes.codes_release(m[0])
+                    except Exception:
+                        pass
 
         # Extract primary message metadata
         primary_gid, var_short_name = selected_messages[0]
@@ -239,7 +248,18 @@ def from_grib(
                 all_levels.append(0)
 
         is_ensemble = len(all_members) == num_levels and len(set(all_members)) > 1
-        is_timeseries = len(set(all_times)) > 1 and len(set(all_levels)) <= 1
+        unique_times = sorted(set(all_times))
+        unique_levels = sorted(set(all_levels))
+        num_times = len(unique_times)
+        num_unique_levels = len(unique_levels)
+
+        is_4d_spatiotemporal = (
+            not is_ensemble
+            and num_times > 1
+            and num_unique_levels > 1
+            and (num_times * num_unique_levels == num_levels)
+        )
+        is_timeseries = num_times > 1 and num_unique_levels <= 1 and not is_ensemble
 
         if num_levels > 1:
             if is_ensemble:
@@ -248,6 +268,34 @@ def from_grib(
                         return int(eccodes.codes_get(item[0], "perturbationNumber"))
                     except Exception:
                         return 0
+            elif is_4d_spatiotemporal:
+                def _msg_sort_key(item):
+                    try:
+                        d = int(eccodes.codes_get(item[0], "validityDate"))
+                    except Exception:
+                        try:
+                            d = int(eccodes.codes_get(item[0], "dataDate"))
+                        except Exception:
+                            d = 0
+                    try:
+                        t = int(eccodes.codes_get(item[0], "validityTime"))
+                    except Exception:
+                        try:
+                            t = int(eccodes.codes_get(item[0], "dataTime"))
+                        except Exception:
+                            t = 0
+                    try:
+                        s = int(eccodes.codes_get(item[0], "step"))
+                    except Exception:
+                        try:
+                            s = int(eccodes.codes_get(item[0], "forecastTime"))
+                        except Exception:
+                            s = 0
+                    try:
+                        lvl = int(eccodes.codes_get(item[0], "level"))
+                    except Exception:
+                        lvl = 0
+                    return (d, t, s, lvl)
             elif is_timeseries:
                 def _msg_sort_key(item):
                     try:
@@ -302,6 +350,8 @@ def from_grib(
             v_dim = "member"
             v_role = "ensemble"
             attrs["grib:ensemble_members"] = ",".join(str(m) for m in sorted_members)
+        elif is_4d_spatiotemporal:
+            pass
         elif is_timeseries:
             v_dim = "time"
             v_role = "time"
@@ -312,7 +362,19 @@ def from_grib(
             v_dim = "level"
             v_role = "vertical"
 
-        if num_levels > 1:
+        if is_4d_spatiotemporal:
+            attrs["grib:levels"] = ",".join(str(lvl) for lvl in unique_levels)
+            if ni > 0 and nj > 0:
+                stacked = np.stack([s.reshape((nj, ni)) for s in data_slices], axis=0).reshape(
+                    (num_times, num_unique_levels, nj, ni)
+                )
+                dims = ["time", "level", "latitude", "longitude"]
+                roles = ["time", "vertical", "latitude", "longitude"]
+            else:
+                stacked = np.stack(data_slices, axis=0).reshape((num_times, num_unique_levels, -1))
+                dims = ["time", "level", "points"]
+                roles = ["time", "vertical", "other"]
+        elif num_levels > 1:
             attrs["grib:levels"] = ",".join(str(lvl) for lvl in all_levels)
             if ni > 0 and nj > 0:
                 stacked = np.stack([s.reshape((nj, ni)) for s in data_slices], axis=0)
@@ -339,12 +401,29 @@ def from_grib(
         if chunk_shape is not None:
             resolved_chunk_shape = list(chunk_shape)
         else:
-            resolved_chunk_shape = list(stacked.shape)
             max_chunk_bytes = 32 * 1024 * 1024
             elem_size = max(1, stacked.dtype.itemsize)
-            for idx in range(len(resolved_chunk_shape)):
-                while resolved_chunk_shape[idx] > 1 and int(np.prod(resolved_chunk_shape)) * elem_size > max_chunk_bytes:
-                    resolved_chunk_shape[idx] = max(1, resolved_chunk_shape[idx] // 2)
+            if is_4d_spatiotemporal and ni > 0 and nj > 0:
+                # Cache-friendly default: [1, 1, nj, ni] if slice <= 32 MiB
+                slice_bytes = nj * ni * elem_size
+                if slice_bytes <= max_chunk_bytes:
+                    resolved_chunk_shape = [1, 1, nj, ni]
+                else:
+                    resolved_chunk_shape = list(stacked.shape)
+                    for idx in range(len(resolved_chunk_shape)):
+                        while (
+                            resolved_chunk_shape[idx] > 1
+                            and int(np.prod(resolved_chunk_shape)) * elem_size > max_chunk_bytes
+                        ):
+                            resolved_chunk_shape[idx] = max(1, resolved_chunk_shape[idx] // 2)
+            else:
+                resolved_chunk_shape = list(stacked.shape)
+                for idx in range(len(resolved_chunk_shape)):
+                    while (
+                        resolved_chunk_shape[idx] > 1
+                        and int(np.prod(resolved_chunk_shape)) * elem_size > max_chunk_bytes
+                    ):
+                        resolved_chunk_shape[idx] = max(1, resolved_chunk_shape[idx] // 2)
 
         wx1.write_array(
             output_wx1_path,
