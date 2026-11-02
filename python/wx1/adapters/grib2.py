@@ -329,27 +329,11 @@ def from_grib(
             selected_messages.sort(key=_msg_sort_key)
 
         sorted_members = []
-        data_slices = []
-
-        for gid, _ in selected_messages:
-            if is_ensemble:
-                try:
-                    sorted_members.append(int(eccodes.codes_get(gid, "perturbationNumber")))
-                except Exception:
-                    sorted_members.append(0)
-            values = eccodes.codes_get_values(gid)
-            # If values can be represented bit-exactly as float32, keep float32
-            f32_vals = values.astype(np.float32)
-            if np.all(f32_vals.astype(np.float64) == values):
-                data_slices.append(f32_vals)
-            else:
-                data_slices.append(values)
 
         tol = attrs.get("grib:typeOfLevel", "").lower()
         if is_ensemble:
             v_dim = "member"
             v_role = "ensemble"
-            attrs["grib:ensemble_members"] = ",".join(str(m) for m in sorted_members)
         elif is_4d_spatiotemporal:
             pass
         elif is_timeseries:
@@ -365,34 +349,62 @@ def from_grib(
         if is_4d_spatiotemporal:
             attrs["grib:levels"] = ",".join(str(lvl) for lvl in unique_levels)
             if ni > 0 and nj > 0:
-                stacked = np.stack([s.reshape((nj, ni)) for s in data_slices], axis=0).reshape(
-                    (num_times, num_unique_levels, nj, ni)
-                )
+                stacked = np.empty((num_times, num_unique_levels, nj, ni), dtype=np.float32)
                 dims = ["time", "level", "latitude", "longitude"]
                 roles = ["time", "vertical", "latitude", "longitude"]
+                for idx, (gid, _) in enumerate(selected_messages):
+                    t_idx = idx // num_unique_levels
+                    l_idx = idx % num_unique_levels
+                    vals = eccodes.codes_get_values(gid)
+                    stacked[t_idx, l_idx] = vals.astype(np.float32).reshape((nj, ni))
             else:
-                stacked = np.stack(data_slices, axis=0).reshape((num_times, num_unique_levels, -1))
+                stacked = np.empty((num_times, num_unique_levels, ni), dtype=np.float32)
                 dims = ["time", "level", "points"]
                 roles = ["time", "vertical", "other"]
-        elif num_levels > 1:
-            attrs["grib:levels"] = ",".join(str(lvl) for lvl in all_levels)
-            if ni > 0 and nj > 0:
-                stacked = np.stack([s.reshape((nj, ni)) for s in data_slices], axis=0)
-                dims = [v_dim, "latitude", "longitude"]
-                roles = [v_role, "latitude", "longitude"]
-            else:
-                stacked = np.stack(data_slices, axis=0)
-                dims = [v_dim, "points"]
-                roles = [v_role, "other"]
+                for idx, (gid, _) in enumerate(selected_messages):
+                    t_idx = idx // num_unique_levels
+                    l_idx = idx % num_unique_levels
+                    vals = eccodes.codes_get_values(gid)
+                    stacked[t_idx, l_idx] = vals.astype(np.float32)
+            selected_messages = []
         else:
-            if ni > 0 and nj > 0:
-                stacked = data_slices[0].reshape((nj, ni))
-                dims = ["latitude", "longitude"]
-                roles = ["latitude", "longitude"]
+            data_slices = []
+            for gid, _ in selected_messages:
+                if is_ensemble:
+                    try:
+                        sorted_members.append(int(eccodes.codes_get(gid, "perturbationNumber")))
+                    except Exception:
+                        sorted_members.append(0)
+                values = eccodes.codes_get_values(gid)
+                # If values can be represented bit-exactly as float32, keep float32
+                f32_vals = values.astype(np.float32)
+                if np.all(f32_vals.astype(np.float64) == values):
+                    data_slices.append(f32_vals)
+                else:
+                    data_slices.append(values)
+
+            if is_ensemble:
+                attrs["grib:ensemble_members"] = ",".join(str(m) for m in sorted_members)
+
+            if num_levels > 1:
+                attrs["grib:levels"] = ",".join(str(lvl) for lvl in all_levels)
+                if ni > 0 and nj > 0:
+                    stacked = np.stack([s.reshape((nj, ni)) for s in data_slices], axis=0)
+                    dims = [v_dim, "latitude", "longitude"]
+                    roles = [v_role, "latitude", "longitude"]
+                else:
+                    stacked = np.stack(data_slices, axis=0)
+                    dims = [v_dim, "points"]
+                    roles = [v_role, "other"]
             else:
-                stacked = data_slices[0]
-                dims = ["points"]
-                roles = ["other"]
+                if ni > 0 and nj > 0:
+                    stacked = data_slices[0].reshape((nj, ni))
+                    dims = ["latitude", "longitude"]
+                    roles = ["latitude", "longitude"]
+                else:
+                    stacked = data_slices[0]
+                    dims = ["points"]
+                    roles = ["other"]
 
         ds_id = dataset_id or f"{in_file.stem}_{var_short_name}"
         var_path = f"/{var_short_name}"
