@@ -297,6 +297,21 @@ def to_odim_h5(
     return out_file
 
 
+def _clean_attr_str(v: Any) -> str:
+    if isinstance(v, (bytes, bytearray)):
+        return v.decode("utf-8", "replace").strip()
+    if hasattr(v, "tolist"):
+        v = v.tolist()
+    if isinstance(v, (list, tuple)) and len(v) == 1:
+        v = v[0]
+    if isinstance(v, (bytes, bytearray)):
+        return v.decode("utf-8", "replace").strip()
+    s = str(v).strip()
+    if s.startswith("b'") and s.endswith("'"):
+        s = s[2:-1]
+    return s.strip("[]'\" ")
+
+
 def from_odim_h5(
     input_path: str | Path,
     output_wx1_path: str | Path,
@@ -332,7 +347,7 @@ def from_odim_h5(
         for grp_name in ("what", "where", "how", "dataset1/what", "dataset1/where", "dataset1/data1/what"):
             if grp_name in hf:
                 for k, v in hf[grp_name].attrs.items():
-                    val_str = v.decode("utf-8", "replace") if isinstance(v, bytes) else str(v)
+                    val_str = _clean_attr_str(v)
                     if k.startswith("wx1_"):
                         attrs[k[4:]] = val_str
                     else:
