@@ -83,6 +83,48 @@ Uitgevoerd via `bench/runner/bench_wind_codec_optimization.py` op alle 124.588.8
 | **8. Error-bounded 0.01 m/s** | `zstd_shuffle` | `[3, 721, 1440]` | **146,20 MB** | **3,41×** | 21,30 ms | $\le 0.0078\text{ m/s}$ |
 
 ### Conclusies van de Wind-optimalisatie:
-1. **ByteShuffle blijft superieur voor lossless opslag**: Zstd met ByteShuffle (245,77 MB) is **61 MB compacter** dan pure Zstd (306,85 MB), doordat de exponent- en hoogste mantisse-bytes van de windvectoren sterk correleren.
+1. **ByteShuffle blijft superieur voor lossless opslag**: Zstd met ByteShuffle (245,77 MB) is **61 MB compacter** dan pure Zstd (306,85 MB), doordat de exponent- en hoogste mantisse-bytes van de windvectoren sterk correleren. (Geverifieerd op zowel `u10` als `v10`).
 2. **2D Chunking levert een 8× snellere willekeurige slice-toegang op**: Het verkleinen van de chunk naar `[1, 721, 1440]` verlaagt de slice-uitleestijd naar **8,22 ms** (t.o.v. 63,39 ms bij grotere chunks), zónder noemenswaardig compressieverlies (306,88 MB vs 306,84 MB).
-3. **Error-Bounded Quantization (`profile="output"`)**: In operationele weersvoorspellingen en post-processing is fysische meetonnauwkeurigheid van wind minimaal $\pm 0.1\text{ m/s}$. Een declared error bound van $\pm 0.01\text{ m/s}$ maakt WX-1 **146,20 MB** (40 MB kleiner dan NetCDF-4), en bij $\pm 0.05\text{ m/s}$ krimpt de windvector naar **99,76 MB** (5,0× compressie, 86 MB kleiner dan NetCDF-4).
+3. **Eerlijke Lossy Vergelijking met NetCDF-4**: Onder identieke foutbegrenzing ($\pm 0.01\text{ m/s}$) is NetCDF-4 lossy (`least_significant_digit=2`) **161,51 MB** groot, terwijl WX-1 (`lossy_error_bound=0.01`) **146,20 MB** groot is. WX-1 is dus **15,31 MB compacter** onder identieke wetenschappelijke condities.
+
+---
+
+## 4. Ruimtelijk Tegelen vs. Horizontale Kaarten (Workloads R2, R4, R5)
+
+Uitgevoerd via `bench/runner/bench_tiling_and_derived_wind_quantization.py` op het 120-stappen ERA5 oppervlaktewindveld ($120 \times 721 \times 1440$ float32):
+
+| Metriek / Workload | Kaart-geoptimaliseerd (`[1, 721, 1440]`) | Ruimtelijk Getegeld (`[120, 32, 32]`) | Snelheidsfactor / Conclusie |
+| :--- | :--- | :--- | :--- |
+| **Bestandsgrootte op schijf** | **246,12 MB** | 266,52 MB | Slechts 20,4 MB (8%) overhead voor spatial tiling |
+| **R2: Volledige 2D Weerkaart ($721 \times 1440$)** | **8,86 ms** | 262,34 ms | **Kaart-chunking is 29,6× SNELLER** voor 2D-kaarten |
+| **R4: Station Tijdreeks 120 stappen (De Bilt)** | 282,04 ms | **0,94 ms** | **Ruimtelijk tegelen is 299,4× SNELLER** (sub-milliseconde!) |
+| **R5: Regionale Uitsnede Europa ($41 \times 41 \times 120$)**| 280,42 ms | **2,01 ms** | **Ruimtelijk tegelen is 139,6× SNELLER** |
+
+*Inzicht*: Voor synoptische weerkaarten is `[1, 721, 1440]` superieur. Voor lokale weer-apps en tijdreeksen op stations is `[120, 32, 32]` bijna **300× sneller**, omdat met één chunk I/O de complete tijdreeks van 120 stappen binnenkomt.
+
+---
+
+## 5. Fysische Afgeleide Grootheden onder Windkwantisatie
+
+Kwantificering van de numerieke fout op de reële fysische velden op de bol ($R = 6.371 \times 10^6\text{ m}$):
+
+### 5.1 Windsnelheid ($V = \sqrt{u^2 + v^2}$)
+* Grondwaarheid bereik: $0,00\text{ m/s}$ tot $35,27\text{ m/s}$ (gemiddeld $6,50\text{ m/s}$).
+* **Bound $0,01\text{ m/s}$**: Max fout = **$0,011\text{ m/s}$** (relatieve fout: **0,031%**), RMSE = **$0,0045\text{ m/s}$**.
+* **Bound $0,05\text{ m/s}$**: Max fout = **$0,044\text{ m/s}$** (relatieve fout: **0,125%**), RMSE = **$0,018\text{ m/s}$**.
+
+### 5.2 Meteorologische Windrichting ($0..360^\circ$ voor $V > 1,0\text{ m/s}$)
+* **Bound $0,01\text{ m/s}$**: Gemiddelde fout = **$0,049^\circ$**, 99e percentiel = **$0,272^\circ$**, Max fout = **$0,618^\circ$**.
+* **Bound $0,05\text{ m/s}$**: Gemiddelde fout = **$0,194^\circ$**, 99e percentiel = **$1,088^\circ$**, Max fout = **$2,467^\circ$**.
+
+### 5.3 Relatieve Vorticiteit op Bolcoördinaten ($\zeta = \frac{1}{R\cos\phi}(\frac{\partial v}{\partial \lambda} - \frac{\partial(u\cos\phi)}{\partial\phi})$)
+* Grondwaarheid vorticiteitsschaal: Max = $8,18 \times 10^{-4}\text{ s}^{-1}$, Standaardafwijking $\sigma_\zeta = 3,41 \times 10^{-5}\text{ s}^{-1}$.
+* **Bound $0,01\text{ m/s}$**:
+  * Max vorticiteitsfout: $9,57 \times 10^{-6}\text{ s}^{-1}$
+  * RMSE vorticiteitsfout: $4,93 \times 10^{-7}\text{ s}^{-1}$ (**slechts 1,45%** van de fysische standaardafwijking $\sigma_\zeta$).
+* **Bound $0,05\text{ m/s}$**:
+  * Max vorticiteitsfout: $3,51 \times 10^{-5}\text{ s}^{-1}$
+  * RMSE vorticiteitsfout: $1,99 \times 10^{-6}\text{ s}^{-1}$ (**5,84%** van de fysische standaardafwijking $\sigma_\zeta$).
+
+### Conclusie voor NWP-toepassingen:
+Voor visualisaties en publieke weersverwachtingen is een richtingsfout van $< 0,1^\circ$ en een vorticiteits-RMSE van 1,45% volkomen verwaarloosbaar, terwijl het bestand van 246 MB naar 146 MB krimpt. Voor herstart- en numerieke integratieprofielen (`profile="restart"`) blijft lossy quantisatie echter strikt verboden, omdat de ruimtelijke afgeleiden van de vorticiteit in chaotische stromingsvergelijkingen (Navier-Stokes) exponentieel kunnen divergeren.
