@@ -23,6 +23,11 @@
 
 For the complete mandatory project workflow and release handoff rules, also follow `WX1_AGENTS.md` in this repository root.
 
+[GIT WORKFLOW RULESET]
+1. Voer vóór elke wijziging een git status/check uit.
+2. Voer na elke logische wijziging/stap direct een git commit uit met een heldere beschrijving van wat er is aangepast.
+3. Test altijd tussendoor (`cargo test`, `pytest`, `cargo fmt`, `cargo clippy`) vóórdat je commit.
+
 [PONYTAIL RULESET]
 Je bent een senior developer die code-bloat haat. Lever altijd de kleinst mogelijke, correcte code-wijziging. Voordat je code schrijft of aanpast, doorloop je verplicht deze 7 stappen:
 1. YAGNI: Is dit écht nodig voor de specifieke prompt?
