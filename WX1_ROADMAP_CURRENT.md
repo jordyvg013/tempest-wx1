@@ -69,6 +69,24 @@ De lineaire arrayplanner is een bekende schaalbaarheidsrisico. Na de Fase-2-nulm
 | 9 | Stabiele C ABI, cbindgen en golden files | 0032 | Geïmplementeerd en geverifieerd (crates/wx1-ffi, include/wx1.h, GCC C-integratietest) |
 | 10 | GPU/multi-device overdracht, async writer en restart, pas na CPU API-stabiliteit | 0033 | Geïmplementeerd en geverifieerd (DLPack/JAX/PyTorch ingestie, non-blocking transfer, bit-exact restart) |
 
+## Fase 5 — Reële ECMWF ERA5 & Operationele NWP-Gereedheid
+
+**Status: Actief / in uitvoering (2026-11-02).**
+
+1. **v1.0.0-rc1 Release Packaging**: Volledige build inclusief standalone CLI, C-ABI FFI (`libwx1_ffi.so` + `include/wx1.h`), Python native manylinux wheel en hardware GPU-verificatie op NVIDIA RTX 3060 Laptop (SHA-256: `949405e35f875a2be247a128092a101bf71ae4e728bf27d40034003a7551cbe4`).
+2. **ERA5 Reële Surface Reanalysis (7 Variabelen)**:
+   - 100% bit-exacte verificatie op 124.588.800 elementen per variabele (`tp`, `t2m`, `msl`, `u10`, `v10`, `sp`, `sst`).
+   - WX-1 is 7,4% compacter dan NetCDF-4 en 32,3% compacter dan GRIB1, met 4,6× tot 5,5× snellere 2D slice-uitlezing en 19,5× snellere container open latency.
+3. **ERA5 Reële 4D Pressure Level Tensoren (10..1000 hPa)**:
+   - 25,36 GB GRIB1 dataset geanalyseerd (13.200 berichten, 10 variabelen, 11 niveaus, 120 stappen).
+   - 4D spatio-temporele adapterondersteuning in `from_grib()` met pre-allocated single-buffer allocatie en `[1, 1, 721, 1440]` cache-vriendelijke 2D slice-chunking.
+   - Temperatuur `t` (1,87 GB, 2,92× compressie) en Geopotentiaal `z` (1,51 GB, 3,63× compressie) geconverteerd en geverifieerd. T500 in 24,57 ms, Z500 in 38,66 ms, De Bilt radiosonde in 178,98 ms.
+4. **Adaptive Per-Variable Codec & Chunking Optimalisatie**:
+   - Uitgevoerd op reële windvectoren (`u10`): 2D chunking geeft ~8× snellere random slice access (8,22 ms) zonder opslagboete; error-bounded quantisatie ($\pm 0.01\text{ m/s}$) levert 3,41× compressie op (146 MB vs 186 MB in NetCDF-4).
+5. **Vervolg**:
+   - Afronding van de resterende 8 4D pressure-level variabelen (`u`, `v`, `w`, `q`, `r`, `pv`, `cc`, `ciwc`).
+   - AI/NWP dataloader pipeline (JAX/PyTorch) voor direct streamen naar GPU-accelerators.
+
 ADR 0019 blijft de interne Rust-microbenchmark; ADR 0021 wordt de aparte cross-format-suite. Bestaande ADR's 0001–0019 worden niet hernummerd.
 
 ## Benchmarkgate

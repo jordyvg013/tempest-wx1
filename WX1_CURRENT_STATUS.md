@@ -1,30 +1,44 @@
 # WX-1 — Current verified status
 
 **Statusdatum:** 2026-11-02  
-**Laatste door de gebruiker geverifieerde opslagbasis:** `WX1_standalone_v0.4.3`
-**Actieve Python-integratietak:** `WX1_standalone_v0.4.3-phase1-fix2`
-**Formaatstatus:** experimenteel; v1.0 robuustheid, crash recovery, golden vectors en security hardening voltooid (ADR 0031).
+**Laatste door de gebruiker geverifieerde opslagbasis:** `v1.0.0-rc1` (Release Candidate 1, SHA-256: `949405e35f875a2be247a128092a101bf71ae4e728bf27d40034003a7551cbe4`)  
+**Actieve tak / Git HEAD:** `master` (commits `b93dd4b`, `fffeb34`)  
+**Formaatstatus:** v1.0.0-rc1 productie-kandidaat; volledige validatie op reële ECMWF ERA5 Surface (7 variabelen) en 4D Pressure Level datasets (13.200 berichten, 54,8 GB raw).
 
 ## 1. Bewijsbasis
 
-### v0.4.3 + Fase 4 Onderdeel 8, 9 & 10 Rust-, Python- & C-ABI-verificatie
-
+### 1.1 v1.0.0-rc1 Release Packaging & Suite-Verificatie
 - `cargo fmt --all -- --check`: uitgevoerd en zonder fout afgerond (0 diffs).
 - `cargo clippy --workspace --all-targets -- -D warnings`: uitgevoerd en zonder waarschuwingen afgerond (0 warnings over alle 5 workspace-crates).
-- `cargo test --workspace`: 163 geslaagd, 0 mislukt.
-  - 85 wx1-format unit-tests;
-  - 24 scientific-array integration tests;
-  - 7 scientific-streaming integration tests;
-  - 14 wx1-registry tests;
-  - 11 independent golden vectors tests;
-  - 12 fuzzing, crash recovery and security hardening tests;
-  - 4 wx1-ffi tests (inclusief automatische C-integratiebuild en testrun via GCC);
-  - 4 wx1-python-native tests;
-  - 1 CLI scientific workflow test.
-- `pytest python/tests`: 52 geslaagd, 3 geskipt (conformance golden vectors 11/11, adapters, xarray backend, roundtrip, DLPack/JAX/PyTorch restart tests).
-- ADR 0031 (Fuzzing, Golden Vectors, Power-Loss Resilience, Security Hardening, Cross-Platform) volledig geverifieerd.
-- ADR 0032 (Stabiele C-ABI, cbindgen, `include/wx1.h`, GCC C-integratietest) volledig geïmplementeerd en geverifieerd.
-- ADR 0033 (GPU/Multi-Device integratie, non-blocking transfer, bit-exacte herstart) volledig geïmplementeerd en geverifieerd.
+- `cargo test --workspace`: 163 geslaagd, 0 mislukt (alle unit-, integration-, golden vectors- en security hardening tests).
+- `gcc tests/c_integration/test_c_abi.c -lwx1_ffi`: 8/8 C-ABI verificatietests geslaagd (buffer capacity guard, bit-exact array slice read, error handling).
+- `pytest python/tests`: 56 geslaagd, 3 geskipt (inclusief physical NVIDIA RTX 3060 Laptop 6GB GPU tests via JAX/CUDA 12).
+- Wheel install: `wx1_python_native-0.1.0-cp312-cp312-manylinux_2_34_x86_64.whl` succesvol geïnstalleerd en end-to-end geverifieerd.
+
+### 1.2 Reële ECMWF ERA5 Surface Multi-Format Benchmark (Alle 7 Variabelen)
+- **Data**: 120 tijdstappen (september 2026, 6-uurs resolutie) op 0.25° globaal grid ($721 \times 1440$), $124.588.800$ floats per variabele.
+- **Bit-Exactheid**: Alle 7 variabelen (`tp`, `t2m`, `msl`, `u10`, `v10`, `sp`, `sst`) zijn 100% bit-exact geverifieerd t.o.v. de NetCDF-4 bron ($\Delta_{\max} = 0.0$ via `.view(np.uint32)`).
+- **Opslag**: 
+  - Raw volume: 3.488,52 MB (3,49 GB)
+  - NetCDF-4 (zlib): 1.225,78 MB
+  - GRIB Edition 1: 1.675,46 MB (840 berichten)
+  - **WX-1 (Zstd+Shuffle)**: **1.134,55 MB** (**91,23 MB kleiner dan NetCDF-4**, **540,91 MB kleiner dan GRIB1**).
+- **Leesprestaties**:
+  - Container open (R1): WX-1 **2,97 ms** vs NetCDF-4 57,91 ms (**19,5× sneller**).
+  - 2D globaal veld (R2 cold cache): WX-1 **178,83 ms** vs NetCDF-4 829,80 ms (**4,64× sneller**).
+  - 2D globaal veld (R2 warm cache): WX-1 **159,08 ms** vs NetCDF-4 883,33 ms (**5,55× sneller**).
+  - Full volume read (124.6M floats): WX-1 **2,55 s** (195,8 MB/s) vs NetCDF-4 3,82 s (130,5 MB/s).
+
+### 1.3 Reële ECMWF ERA5 4D Pressure Level Tensor & Wind Benchmark
+- **Data**: 25,36 GB GRIB1 bestand (`d09d810dc31d23c9a510bf055175ffa9.grib`), 13.200 berichten (10 variabelen × 11 isobare niveaus 10..1000 hPa × 120 tijdstappen).
+- **4D Tensoren `[120, 11, 721, 1440]` in WX-1**:
+  - 4D Temperatuur `t`: **1.874,48 MB** (2,92× compressie vs 5.481,91 MB raw). T500 slice latency: **24,57 ms**, 3D kolom: **223,04 ms**.
+  - 4D Geopotentiaal `z`: **1.511,26 MB** (3,63× compressie vs 5.481,91 MB raw). Z500 slice latency: **38,66 ms**.
+  - Virtuele radiosonde De Bilt (52.1°N, 5.18°E) uitgelezen in **178,98 ms** met fysisch exact verticaal temperatuurprofiel.
+- **Wind-Codec Optimalisatie**:
+  - Zstd+Shuffle blijft voor lossless wind superieur (245,77 MB vs 306,85 MB voor pure Zstd).
+  - 2D chunking `[1, 721, 1440]` verlaagt slice-latency naar **8,22 ms** (bijna 8× sneller) zonder compressieverlies.
+  - Error-bounded kwantisatie ($\pm 0.01\text{ m/s}$) verkleint wind naar **146,20 MB** (40 MB kleiner dan NetCDF-4) en bij $\pm 0.05\text{ m/s}$ naar **99,76 MB** (5,0× compressie).
 
 ## 2. WSL-omgeving uit de aangeleverde run
 
