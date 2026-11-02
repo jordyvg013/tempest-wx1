@@ -7,8 +7,8 @@ import numpy as np
 import pytest
 import wx1
 
-# Enforce JAX CPU platform for reproducible testing without GPU allocation noise
-os.environ["JAX_PLATFORMS"] = "cpu"
+# Prevent JAX greedy preallocation of entire GPU VRAM
+os.environ.setdefault("XLA_PYTHON_CLIENT_PREALLOCATE", "false")
 
 
 def test_jax_array_write_and_bit_exact_readback(tmp_path):

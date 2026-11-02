@@ -329,8 +329,13 @@ fn test_power_loss_subprocess_sigkill_recovery() {
         .spawn()
         .expect("spawning child writer must succeed");
 
-    // Wait a brief moment for child to append partial bytes
-    std::thread::sleep(std::time::Duration::from_millis(50));
+    // Wait up to 1 second for child to append uncommitted trailing bytes
+    for _ in 0..100 {
+        if std::fs::metadata(&file_path).unwrap().len() > gen1_size {
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(10));
+    }
 
     // Abruptly kill with SIGKILL
     child.kill().expect("SIGKILL child process must succeed");
