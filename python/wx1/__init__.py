@@ -6,6 +6,12 @@ import sys
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
+# ==============================================================================
+# BLOCK 1: CORE NATIVE BINDINGS & EXPORT DECLARATIONS
+# Purpose: Load the compiled PyO3 native extension (_core / wx1_python_native)
+#          and declare public symbols for high-performance scientific I/O.
+# ==============================================================================
+
 try:
     from . import _core
 except ImportError:
@@ -56,6 +62,12 @@ __all__ = [
     "read_restart_checkpoint",
 ]
 
+
+# ==============================================================================
+# BLOCK 2: NUMPY & DEVICE TENSOR CONVERSIONS (JAX, PyTorch, DLPack)
+# Purpose: Handle endianness, dtype normalization, and zero-copy/zero-overhead
+#          conversions between GPU accelerators (CUDA/JAX/PyTorch) and host RAM.
+# ==============================================================================
 
 def _require_core():
     if _core is None:
@@ -136,6 +148,12 @@ def _place_on_device(arr, to_device: str | None):
             raise ImportError("to_device='torch' requires the 'torch' package") from exc
     raise ValueError(f"Unsupported to_device '{to_device}'; expected 'cpu', 'jax', or 'torch'")
 
+
+# ==============================================================================
+# BLOCK 3: SCIENTIFIC FILE CONTAINER & LAZY SLICE READER (Wx1File, open_file)
+# Purpose: Provide high-level inspection, chunk planning, and sub-volume slicing
+#          without full decompression overhead.
+# ==============================================================================
 
 class Wx1File:
     """Python convenience wrapper around a fully validated native WX-1 snapshot."""
@@ -307,6 +325,12 @@ def open_file(path: str | Path) -> Wx1File:
     return Wx1File(native)
 
 
+# ==============================================================================
+# BLOCK 4: SCIENTIFIC ARRAY WRITER (write_array)
+# Purpose: Encode multidimensional arrays into WX-1 containers with configurable
+#          chunk shapes, lossless/lossy profiles, codecs, and grid staggering.
+# ==============================================================================
+
 def write_array(
     path: str | Path,
     data,
@@ -401,6 +425,12 @@ def write_array(
         str(tile_dimension) if tile_dimension is not None else None,
     )
 
+
+# ==============================================================================
+# BLOCK 5: ASYNCHRONOUS HIGH-THROUGHPUT WRITER & NWP CHECKPOINTS (ADR 0025, 0033)
+# Purpose: Support non-blocking background commits for NWP timestep loops and
+#          strictly bit-exact model checkpointing with PRNG and simulation state.
+# ==============================================================================
 
 class AsyncWriter:
     """Bounded asynchronous WX-1 writer for NWP timestep loops (ADR 0025)."""
@@ -632,6 +662,12 @@ def open_dataset(path: str | Path, **kwargs):
     return xr.open_dataset(path, engine=engine, **kwargs)
 
 
+# ==============================================================================
+# BLOCK 6: PHYSICAL UNITS & CF REGISTRY HELPERS (ADR 0027)
+# Purpose: Resolve physical dimensions, unit conversion factors, and canonical
+#          CF standard names using the built-in WMO and CF registries.
+# ==============================================================================
+
 def unit_dimension(unit: str) -> str | None:
     """Returns the physical dimension name for a known unit (e.g. 'temperature', 'pressure')."""
     return _require_core().unit_dimension(str(unit))
@@ -647,6 +683,12 @@ def resolve_cf_standard_name(name: str) -> dict[str, str] | None:
     res = _require_core().resolve_cf_standard_name(str(name))
     return dict(res) if res is not None else None
 
+
+# ==============================================================================
+# BLOCK 7: MULTI-FORMAT METEOROLOGICAL ADAPTERS & CLI CONVERT (ADR 0030)
+# Purpose: Expose high-level facades for bidirectional import and export
+#          across GRIB2, NetCDF-4, Zarr, BUFR, HDF5, GeoTIFF, and radar formats.
+# ==============================================================================
 
 def from_grib(*args, **kwargs):
     """Import a WMO GRIB2 file into a WX-1 container (ADR 0030)."""

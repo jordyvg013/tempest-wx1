@@ -18,6 +18,13 @@ from xarray.core.indexing import (
 from . import open_file
 
 
+# ==============================================================================
+# BLOCK 1: LAZY SUB-VOLUME SLICING ADAPTER (Wx1BackendArray)
+# Purpose: Intercept xarray / Dask index keys (slices, steps, integers) and
+#          map them to bounded WX-1 read_array_slice calls without loading
+#          unselected chunks into memory.
+# ==============================================================================
+
 class Wx1BackendArray(BackendArray):
     """BackendArray that requests only the chunks intersecting each selection."""
 
@@ -74,6 +81,12 @@ class Wx1BackendArray(BackendArray):
         array = self._file.read_array_slice(self._path, starts, counts)
         return array[tuple(post_index)]
 
+
+# ==============================================================================
+# BLOCK 2: XARRAY ENGINE ENTRYPOINT (engine="wx1")
+# Purpose: Integrate WX-1 natively into xarray.open_dataset, populating dataset
+#          coordinates, attributes, and variables with lazy Dask-compatible backend arrays.
+# ==============================================================================
 
 class Wx1BackendEntrypoint(BackendEntrypoint):
     """xarray entrypoint registered as ``engine='wx1'``."""

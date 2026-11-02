@@ -12,6 +12,12 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 
+# ==============================================================================
+# BLOCK 1: WMO GRIB METADATA SCHEMA & EXPORT KEY REGISTRIES
+# Purpose: Define canonical WMO GRIB Edition 1 & 2 metadata keys, ensuring all
+#          discipline, parameter, grid, and level keys are preserved losslessly.
+# ==============================================================================
+
 GRIB_METADATA_KEYS = [
     "edition",
     "centre",
@@ -92,6 +98,11 @@ GRIB_EXPORT_STR_KEYS = {
 }
 
 
+# ==============================================================================
+# BLOCK 2: ECCODES RUNTIME DEPENDENCY & XARRAY INTEGRATION
+# Purpose: Check ecCodes library availability and provide cfgrib dataset loader.
+# ==============================================================================
+
 def _require_eccodes():
     try:
         import eccodes
@@ -117,6 +128,13 @@ def open_dataset(path, *, filter_by_keys=None, indexpath="", **kwargs):
         backend_kwargs["filter_by_keys"] = dict(filter_by_keys)
     return xr.open_dataset(path, engine="cfgrib", backend_kwargs=backend_kwargs, **kwargs)
 
+
+# ==============================================================================
+# BLOCK 3: GRIB TO WX-1 SCIENTIFIC CONTAINER IMPORT (4D SPATIO-TEMPORAL TENSORS)
+# Purpose: Stream and ingest GRIB1/GRIB2 messages into WX-1. Automatically detects
+#          multi-level, time-series, and 4D [time, level, lat, lon] structures,
+#          pre-allocates memory to prevent spikes, and creates 2D slice chunks.
+# ==============================================================================
 
 def from_grib(
     input_path: str | Path,
@@ -463,6 +481,12 @@ def from_grib(
             except Exception:
                 pass
 
+
+# ==============================================================================
+# BLOCK 4: WX-1 SCIENTIFIC CONTAINER EXPORT TO WMO GRIB2 (to_grib)
+# Purpose: Unpack WX-1 arrays (2D, 3D, 4D), restore preserved grib:* metadata,
+#          configure ecCodes handles, and emit valid WMO GRIB2 messages.
+# ==============================================================================
 
 def to_grib(
     input_wx1_path: str | Path,

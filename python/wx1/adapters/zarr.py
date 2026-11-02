@@ -11,6 +11,12 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 
+# ==============================================================================
+# BLOCK 1: ZARR DEPENDENCY & ROLE INFERENCE
+# Purpose: Check zarr-python library availability and map array dimensions to
+#          canonical WX-1 dimension roles (time, vertical, lat, lon).
+# ==============================================================================
+
 def _require_zarr():
     try:
         import zarr
@@ -56,6 +62,11 @@ def _infer_dim_role(dim_name: str) -> str:
         return "ensemble"
     return "other"
 
+
+# ==============================================================================
+# BLOCK 2: ZARR TO WX-1 SCIENTIFIC CONTAINER IMPORT (from_zarr)
+# Purpose: Import Zarr array or hierarchy into WX-1 with preserved chunks and attributes.
+# ==============================================================================
 
 def from_zarr(
     input_path: str | Path,
@@ -174,6 +185,11 @@ def from_zarr(
 
     return wx1.open_file(output_wx1_path)
 
+
+# ==============================================================================
+# BLOCK 3: WX-1 SCIENTIFIC CONTAINER EXPORT TO ZARR (to_zarr)
+# Purpose: Export WX-1 containers back to valid Zarr v2/v3 stores.
+# ==============================================================================
 
 def to_zarr(
     input_wx1_path: str | Path,

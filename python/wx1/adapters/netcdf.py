@@ -11,6 +11,12 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 
+# ==============================================================================
+# BLOCK 1: NETCDF4 DEPENDENCY & CF ROLE INFERENCE
+# Purpose: Check netCDF4 library availability and map NetCDF dimension names
+#          (lat, lon, lev, time, member) to WX-1 canonical dimension roles.
+# ==============================================================================
+
 def _require_netcdf4():
     try:
         import netCDF4
@@ -46,6 +52,12 @@ def _infer_dim_role(dim_name: str) -> str:
         return "ensemble"
     return "other"
 
+
+# ==============================================================================
+# BLOCK 2: NETCDF-4 TO WX-1 SCIENTIFIC CONTAINER IMPORT (from_netcdf)
+# Purpose: Import NetCDF-4 variables into WX-1, preserving attributes, NaN masks,
+#          and dimension roles while re-chunking under 32 MiB bounds.
+# ==============================================================================
 
 def from_netcdf(
     input_path: str | Path,
@@ -166,6 +178,12 @@ def from_netcdf(
 
         return wx1.open_file(output_wx1_path)
 
+
+# ==============================================================================
+# BLOCK 3: WX-1 TO NETCDF-4 EXPORT (to_netcdf)
+# Purpose: Export WX-1 containers back to compliant CF NetCDF-4/Classic files
+#          with optional zlib compression and fill values.
+# ==============================================================================
 
 def to_netcdf(
     input_wx1_path: str | Path,
