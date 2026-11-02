@@ -47,6 +47,8 @@ __all__ = [
     "from_iwrf",
     "to_iwrf",
     "convert",
+    "write_restart_checkpoint",
+    "read_restart_checkpoint",
 ]
 
 
@@ -81,6 +83,53 @@ def _dtype_for_numpy(dtype_name: str, byte_order: str):
     if base in ("u1", "i1", "b1"):
         return np.dtype(base)
     return np.dtype(("<" if byte_order == "little" else ">") + base)
+
+
+def _to_host_numpy(data):
+    """Transfers arbitrary device arrays (JAX, DLPack, PyTorch, CuPy) or NumPy arrays to contiguous host NumPy (ADR 0033)."""
+    np = _numpy()
+    if isinstance(data, np.ndarray):
+        return data
+    # 1. JAX array detection
+    if "jax" in sys.modules:
+        try:
+            import jax
+            if isinstance(data, jax.Array):
+                return np.asarray(data)
+        except Exception:
+            pass
+    # 2. DLPack protocol
+    if hasattr(data, "__dlpack__"):
+        try:
+            return np.from_dlpack(data)
+        except Exception:
+            pass
+    # 3. PyTorch / CuPy / general device tensor with .cpu()
+    if hasattr(data, "cpu") and callable(data.cpu):
+        try:
+            return np.asarray(data.cpu())
+        except Exception:
+            pass
+    return np.asarray(data)
+
+
+def _place_on_device(arr, to_device: str | None):
+    """Transfers host NumPy array to requested device (e.g. 'jax', 'cpu') (ADR 0033)."""
+    if to_device is None or to_device == "cpu" or to_device == "numpy":
+        return arr
+    if to_device == "jax":
+        try:
+            import jax
+            return jax.numpy.asarray(arr)
+        except ImportError as exc:
+            raise ImportError("to_device='jax' requires the 'jax' package") from exc
+    if to_device == "torch":
+        try:
+            import torch
+            return torch.as_tensor(arr)
+        except ImportError as exc:
+            raise ImportError("to_device='torch' requires the 'torch' package") from exc
+    raise ValueError(f"Unsupported to_device '{to_device}'; expected 'cpu', 'jax', or 'torch'")
 
 
 class Wx1File:
@@ -176,11 +225,13 @@ class Wx1File:
         count: Sequence[int],
         *,
         copy: bool = False,
+        to_device: str | None = None,
     ):
         np = _numpy()
         raw, dtype_name, byte_order, shape = self.read_raw_slice(variable_path, start, count)
         result = np.frombuffer(raw, dtype=_dtype_for_numpy(dtype_name, byte_order)).reshape(shape)
-        return result.copy() if copy else result
+        arr = result.copy() if copy else result
+        return _place_on_device(arr, to_device)
 
     def read_points(
         self,
@@ -196,7 +247,7 @@ class Wx1File:
         result = np.frombuffer(raw, dtype=_dtype_for_numpy(dtype_name, byte_order)).reshape(tuple(shape))
         return result.copy() if copy else result
 
-    def read_array(self, variable_path: str, *, copy: bool = False):
+    def read_array(self, variable_path: str, *, copy: bool = False, to_device: str | None = None):
         clean = variable_path.lstrip("/")
         variable = next((item for item in self.variables if item["path"] == variable_path or item["path"].lstrip("/") == clean), None)
         if variable is None:
@@ -213,6 +264,7 @@ class Wx1File:
                 [0] * len(shape),
                 shape,
                 copy=copy,
+                to_device=to_device,
             )
         # Bounded batched read along axis 0 when total volume > 64 MiB
         slice_bytes = int(np.prod(shape[1:])) * dtype.itemsize
@@ -226,7 +278,7 @@ class Wx1File:
                 [cnt0] + shape[1:],
                 copy=False,
             )
-        return out
+        return _place_on_device(out, to_device)
 
     def close(self) -> None:
         # The native snapshot retains metadata/descriptors only; every read opens its own file.
@@ -296,7 +348,7 @@ def write_array(
     if profile == "restart" and lossy_error_bound is not None:
         raise ValueError("lossy quantization is strictly forbidden in restart profile")
     np = _numpy()
-    array = np.asarray(data)
+    array = _to_host_numpy(data)
     dtype_names = {
         ("u", 1): "uint8", ("i", 1): "int8",
         ("u", 2): "uint16", ("i", 2): "int16",
@@ -383,9 +435,10 @@ class AsyncWriter:
         )
 
     def submit_step(self, data) -> None:
-        """Stage and enqueue one NWP timestep array into the bounded background writer."""
+        """Stage and enqueue one NWP timestep array into the bounded background writer (ADR 0025, ADR 0033)."""
         np = _numpy()
-        arr = np.ascontiguousarray(data)
+        host_arr = _to_host_numpy(data)
+        arr = np.ascontiguousarray(host_arr)
         self._native.submit_step(arr.tobytes(order="C"))
 
     def flush(self) -> dict[str, int]:
@@ -406,6 +459,159 @@ class AsyncWriter:
         except Exception:
             pass
         return False
+
+
+def write_restart_checkpoint(
+    path: str | Path,
+    state: Any,
+    *,
+    dataset_id: str = "restart_checkpoint",
+    dimensions: Sequence[str] | Mapping[str, Sequence[str]] | None = None,
+    iteration: int | None = None,
+    sim_time_seconds: float | None = None,
+    prng_state: Any | None = None,
+    shard_info: Mapping[str, Any] | None = None,
+    codec: str = "zstd_shuffle",
+    durability: str = "durable",
+    workers: int = 4,
+) -> None:
+    """Writes a 100% bit-exact NWP model restart checkpoint (ADR 0033).
+
+    Guarantees:
+    - Zero lossy quantization (profile is strictly 'restart').
+    - Auxiliary restart metadata: simulation iteration, timestamp, PRNG seed state.
+    - Shard partitioning attributes for multi-device/multi-rank runs.
+    """
+    path = Path(path)
+    meta_attrs = {
+        "wx1:profile": "restart",
+        "wx1:dataset_type": "nwp_checkpoint",
+    }
+    if iteration is not None:
+        meta_attrs["restart:iteration"] = str(int(iteration))
+    if sim_time_seconds is not None:
+        meta_attrs["restart:sim_time_seconds"] = str(float(sim_time_seconds))
+    if prng_state is not None:
+        meta_attrs["restart:prng_state"] = str(prng_state)
+    if shard_info is not None:
+        for k, v in shard_info.items():
+            meta_attrs[f"shard:{k}"] = str(v)
+
+    if isinstance(state, Mapping):
+        if len(state) == 1:
+            var_name, var_arr = next(iter(state.items()))
+            host_arr = _to_host_numpy(var_arr)
+            dims = dimensions if isinstance(dimensions, Sequence) and not isinstance(dimensions, (str, bytes)) else [f"dim_{i}" for i in range(host_arr.ndim)]
+            write_array(
+                path,
+                dataset_id=dataset_id,
+                variable_path=var_name,
+                dimensions=dims,
+                array=host_arr,
+                profile="restart",
+                codec=codec,
+                durability=durability,
+                workers=workers,
+                attributes=meta_attrs,
+            )
+        else:
+            path.mkdir(parents=True, exist_ok=True)
+            import json
+            manifest = {
+                "dataset_id": dataset_id,
+                "iteration": iteration,
+                "sim_time_seconds": sim_time_seconds,
+                "prng_state": prng_state,
+                "shard_info": dict(shard_info) if shard_info else None,
+                "variables": list(state.keys()),
+            }
+            with open(path / "checkpoint_manifest.json", "w", encoding="utf-8") as f:
+                json.dump(manifest, f, indent=2)
+
+            for var_name, var_arr in state.items():
+                var_path = path / f"{var_name}.wx1"
+                host_arr = _to_host_numpy(var_arr)
+                var_dims = None
+                if isinstance(dimensions, Mapping):
+                    var_dims = dimensions.get(var_name)
+                elif isinstance(dimensions, Sequence):
+                    var_dims = dimensions
+                if var_dims is None:
+                    var_dims = [f"dim_{i}" for i in range(getattr(host_arr, "ndim", 2))]
+                write_array(
+                    var_path,
+                    dataset_id=f"{dataset_id}_{var_name}",
+                    variable_path=var_name,
+                    dimensions=var_dims,
+                    data=host_arr,
+                    profile="restart",
+                    codec=codec,
+                    durability=durability,
+                    workers=workers,
+                    attributes=meta_attrs,
+                )
+    else:
+        host_arr = _to_host_numpy(state)
+        dims = dimensions if isinstance(dimensions, Sequence) and not isinstance(dimensions, (str, bytes)) else [f"dim_{i}" for i in range(getattr(host_arr, "ndim", 2))]
+        write_array(
+            path,
+            dataset_id=dataset_id,
+            variable_path="state",
+            dimensions=dims,
+            data=host_arr,
+            profile="restart",
+            codec=codec,
+            durability=durability,
+            workers=workers,
+            attributes=meta_attrs,
+        )
+
+
+def read_restart_checkpoint(
+    path: str | Path,
+    *,
+    to_device: str | None = None,
+) -> dict[str, Any]:
+    """Reads a bit-exact NWP model restart checkpoint and returns restored variables and metadata (ADR 0033)."""
+    path = Path(path)
+    if path.is_file():
+        f = open_file(path)
+        vars_dict = {}
+        for v in f.variables:
+            vars_dict[v["name"]] = f.read_array(v["path"], to_device=to_device)
+        attrs = f.attributes
+        iteration = int(attrs["restart:iteration"]) if "restart:iteration" in attrs else None
+        sim_time = float(attrs["restart:sim_time_seconds"]) if "restart:sim_time_seconds" in attrs else None
+        prng_state = attrs.get("restart:prng_state")
+        shard_info = {k[6:]: v for k, v in attrs.items() if k.startswith("shard:")}
+        return {
+            "variables": vars_dict,
+            "iteration": iteration,
+            "sim_time_seconds": sim_time,
+            "prng_state": prng_state,
+            "shard_info": shard_info if shard_info else None,
+        }
+    elif path.is_dir():
+        import json
+        manifest_path = path / "checkpoint_manifest.json"
+        manifest = {}
+        if manifest_path.exists():
+            with open(manifest_path, "r", encoding="utf-8") as mf:
+                manifest = json.load(mf)
+        vars_dict = {}
+        for wx1_file in sorted(path.glob("*.wx1")):
+            f = open_file(wx1_file)
+            for v in f.variables:
+                vars_dict[v["name"]] = f.read_array(v["path"], to_device=to_device)
+        return {
+            "variables": vars_dict,
+            "iteration": manifest.get("iteration"),
+            "sim_time_seconds": manifest.get("sim_time_seconds"),
+            "prng_state": manifest.get("prng_state"),
+            "shard_info": manifest.get("shard_info"),
+        }
+    else:
+        raise FileNotFoundError(f"Checkpoint path '{path}' does not exist")
 
 
 def open_dataset(path: str | Path, **kwargs):
