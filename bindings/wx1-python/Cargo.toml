@@ -3,7 +3,7 @@ name = "wx1-python-native"
 version = "0.1.0"
 edition = "2021"
 rust-version = "1.85"
-license = "MIT"
+license.workspace = true
 description = "Experimental PyO3 bindings for the WX-1 scientific storage core"
 
 [lib]

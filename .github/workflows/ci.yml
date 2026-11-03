@@ -16,6 +16,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
@@ -44,12 +47,21 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: ${{ matrix.target }}
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Configure Dynamic Library Path
+        shell: bash
+        run: |
+          if [ "${{ runner.os }}" = "Linux" ]; then
+            echo "LD_LIBRARY_PATH=${pythonLocation}/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+          elif [ "${{ runner.os }}" = "macOS" ]; then
+            echo "DYLD_LIBRARY_PATH=${pythonLocation}/lib:$DYLD_LIBRARY_PATH" >> $GITHUB_ENV
+          fi
 
       - name: Run Cargo Workspace Tests
         run: cargo test --workspace --target ${{ matrix.target }}
@@ -72,6 +84,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Configure Dynamic Library Path
+        run: echo "LD_LIBRARY_PATH=${pythonLocation}/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
       - name: Verify All 11 Golden Vectors in Rust
         run: cargo test --test golden_vectors -- --nocapture
       - name: Verify Power-Loss & Fuzzing Suite
