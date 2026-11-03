@@ -201,6 +201,7 @@ def from_grib(
             )
         raise ValueError(f"No valid GRIB2 messages found in: {in_file}")
 
+    released_gids = set()
     try:
         if variable_name is not None:
             selected_messages = messages
@@ -211,6 +212,7 @@ def from_grib(
                 if m[1] != first_var:
                     try:
                         eccodes.codes_release(m[0])
+                        released_gids.add(m[0])
                     except Exception:
                         pass
 
@@ -490,10 +492,12 @@ def from_grib(
 
     finally:
         for gid, _ in messages:
-            try:
-                eccodes.codes_release(gid)
-            except Exception:
-                pass
+            if gid not in released_gids:
+                try:
+                    eccodes.codes_release(gid)
+                    released_gids.add(gid)
+                except Exception:
+                    pass
 
 
 # ==============================================================================
