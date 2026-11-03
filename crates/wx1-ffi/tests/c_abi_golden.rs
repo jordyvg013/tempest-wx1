@@ -13,7 +13,6 @@
 // limitations under the License.
 
 use std::path::PathBuf;
-use std::process::Command;
 
 #[test]
 fn test_golden_header_exists_and_contains_symbols() {
@@ -36,6 +35,8 @@ fn test_golden_header_exists_and_contains_symbols() {
 #[test]
 #[cfg(not(target_env = "msvc"))]
 fn test_compile_and_run_c_integration_binary() {
+    use std::process::Command;
+
     // Only run if gcc is available in PATH
     let gcc_check = Command::new("gcc").arg("--version").output();
     if gcc_check.is_err() {
