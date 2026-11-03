@@ -15,7 +15,7 @@
 //! Parallel tile/rank chunk staging, deterministic merge/commit, and bounded asynchronous
 //! scientific writer with backpressure telemetry (ADR 0025).
 
-use std::fs::{File, OpenOptions};
+use std::fs::OpenOptions;
 use std::io::{Read, Seek, Write};
 use std::path::{Path, PathBuf};
 use std::sync::mpsc::{self, SyncSender};
@@ -254,7 +254,7 @@ pub fn write_staged_generation_container_atomic(
         std::fs::rename(&temp_path, path)?;
         if durability == WriteDurability::Durable {
             #[cfg(unix)]
-            File::open(parent)?.sync_all()?;
+            std::fs::File::open(parent)?.sync_all()?;
         }
         Ok::<(), ChunkIoError>(())
     })();

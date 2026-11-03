@@ -1566,9 +1566,10 @@ fn adr0025_async_scientific_writer_commits_generations_and_records_backpressure(
     };
 
     let scratch_root = std::env::var("WX1_SCRATCH")
-        .unwrap_or_else(|_| "/mnt/d/Weer/Uitvoer/data/wx1_bench_scratch".to_owned());
-    std::fs::create_dir_all(&scratch_root).expect("create scratch dir on D:");
-    let file_path = std::path::PathBuf::from(&scratch_root).join("test_adr0025_async_writer.wx1");
+        .map(std::path::PathBuf::from)
+        .unwrap_or_else(|_| std::env::temp_dir().join("wx1_bench_scratch"));
+    std::fs::create_dir_all(&scratch_root).expect("create scratch dir");
+    let file_path = scratch_root.join("test_adr0025_async_writer.wx1");
     let _ = std::fs::remove_file(&file_path);
 
     let options = AsyncWriterOptions {
