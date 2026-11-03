@@ -35,6 +35,12 @@ fn test_golden_header_exists_and_contains_symbols() {
 
 #[test]
 fn test_compile_and_run_c_integration_binary() {
+    #[cfg(target_env = "msvc")]
+    {
+        eprintln!("Skipping gcc C-ABI test on MSVC target environment (MinGW/MSVC ABI mismatch)");
+        return;
+    }
+
     // Only run if gcc is available in PATH
     let gcc_check = Command::new("gcc").arg("--version").output();
     if gcc_check.is_err() {
