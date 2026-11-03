@@ -71,7 +71,12 @@ Under an identical declared error bound ($\pm 0.01\text{ m/s}$ max error):
 
 ## Quickstart
 
-### Python
+### Supported Platforms
+* **Linux (x86_64, aarch64)**: Full native support, direct asynchronous I/O, and optional NVIDIA CUDA GPU pass-through.
+* **macOS (Apple Silicon, Intel)**: Full native POSIX support.
+* **Windows**: Native Windows (`cmd.exe` / PowerShell) is not supported. Windows users should use **WSL2 (Windows Subsystem for Linux 2, Ubuntu)** for full native POSIX performance, C-ABI compatibility, and GPU acceleration.
+
+### Python Installation
 
 ```bash
 pip install tempest-wx1
